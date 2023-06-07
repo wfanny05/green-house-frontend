@@ -2,22 +2,19 @@
   <a-layout>
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
       <div class="logo" />
-      <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
-        <a-menu-item key="1">
-          <user-outlined />
-          <span>nav 1</span>
-        </a-menu-item>
-        <a-menu-item key="2">
-          <video-camera-outlined />
-          <span>nav 2</span>
-        </a-menu-item>
-        <a-menu-item key="3">
-          <upload-outlined />
-          <span>nav 3</span>
-        </a-menu-item>
+      <a-menu  v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" theme="dark" mode="inline">
+        <a-sub-menu v-for="(item, index) in menu" :key="index+''">
+          <template #icon>
+            <component :is="item.icon" />
+          </template>
+          <template #title>{{ item.title }}</template>
+          <a-menu-item v-for="(child, index2) in item.children" :key="index2+''">
+            <RouterLink :to="child.path as string">{{ child.title }}</RouterLink>
+          </a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
-    <a-layout>
+    <a-layout class="main-layout">
       <a-layout-header class="main-header">
         <menu-unfold-outlined
           v-if="collapsed"
@@ -26,10 +23,16 @@
         />
         <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
       </a-layout-header>
-      <a-layout-content
-        class="main-layout-content"
-      >
-        <slot></slot>
+      <div class="page-title">
+        <a-breadcrumb>
+          <a-breadcrumb-item v-for="item in pageTitle" :key="item">{{ item }}</a-breadcrumb-item>
+        </a-breadcrumb>
+        <h1>{{ pageTitle[pageTitle.length - 1] }}</h1>
+      </div>
+      <a-layout-content class="main-layout-content">
+        <div class="main-layout-content-inner">
+          <Suspense><slot></slot></Suspense>
+        </div>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -41,26 +44,155 @@ import {
   UploadOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute, RouterLink } from 'vue-router'
+
+interface menuItem {
+  title: string;
+  icon?: string;
+  path?: string;
+  children?: menuItem[];
+}
+
 export default defineComponent({
   components: {
+    RouterLink,
     UserOutlined,
     VideoCameraOutlined,
     UploadOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
+    AppstoreOutlined
   },
   setup() {
+    const router = useRouter()
+    const route = useRoute()
+    const menu: menuItem[] = [
+      {
+        title: '大棚管理',
+        icon: 'AppstoreOutlined',
+        children: [
+          {
+            title: '大棚列表',
+            path: '/green-house'
+          },
+          {
+            title: '​​环境信息',
+            path: '/env-info'
+          }
+        ]
+      },
+      // {
+      //   title: '​种子管理',
+      //   icon: 'AppstoreOutlined',
+      //   children: [
+      //     {
+      //       title: '种子列表',
+      //       path: '/seed'
+      //     },
+      //     {
+      //       title: '​​图片管理',
+      //       path: '/seed-image'
+      //     }
+      //   ]
+      // },
+      // {
+      //   title: '​作物管理',
+      //   icon: 'AppstoreOutlined',
+      //   children: [
+      //     {
+      //       title: '实时信息',
+      //       path: '/crop-latest'
+      //     },
+      //     {
+      //       title: '作物列表',
+      //       path: '/crop'
+      //     },
+      //     {
+      //       title: '​​灌溉记录',
+      //       path: '/crop-irrigation'
+      //     },
+      //     {
+      //       title: '​​施肥记录',
+      //       path: '/crop-fertilize'
+      //     },
+      //     {
+      //       title: '​​农药记录',
+      //       path: '/crop-pesticide'
+      //     },
+      //     {
+      //       title: '​​病虫害记录',
+      //       path: '/crop-disease'
+      //     },
+      //   ]
+      // },
+      // {
+      //   title: '​设备管理',
+      //   icon: 'AppstoreOutlined',
+      //   children: [
+      //     {
+      //       title: '传感器列表',
+      //       path: '/sensor'
+      //     },
+      //   ]
+      // }
+    ]
+    let selectedKeys = ref<string[]>([])
+    let openKeys = ref<string[]>([])
+    let pageTitle = ref<string[]>([])
+
+    onMounted(() => {
+      
+    })
+
+    watch(() => route.path, (newValue, oldValue) => {
+      console.log(newValue, '新的路由')
+      console.log(oldValue, '旧的路由')
+      const path = newValue
+      menu.forEach((item, index) => {
+        const children = item.children || []
+        children.forEach((child, index2) => {
+          if (child.path === path) {
+            // setTimeout(() => {
+            //   console.log(selectedKeys.value[0])
+            // }, 0)
+            
+            if (!openKeys.value[0]) {
+              openKeys.value = [index + '']
+            }
+            if (!selectedKeys.value[0]) {
+              selectedKeys.value = [index2 + '']
+            }
+
+            pageTitle.value[0] = item.title
+            pageTitle.value[1] = child.title
+          }
+        })
+      })
+    })
+
     return {
-      selectedKeys: ref<string[]>(['1']),
+      selectedKeys,
+      openKeys,
       collapsed: ref<boolean>(false),
+      menu,
+      pageTitle,
     };
   },
 });
 </script>
 
 <style scoped>
+.main-layout {
+  max-height: 100vh;
+}
+.page-title {
+  background: #fff;
+  padding: 16px 24px 0;
+  margin-top: 2px;
+}
 .main-header {
   background: #fff;
   padding: 0;
@@ -68,11 +200,16 @@ export default defineComponent({
   justify-content: space-between;
 }
 
-.main-layout-content {
+.main-layout-content{
+  height: calc(100vh - 136px);
+  overflow: auto;
+}
+
+.main-layout-content-inner {
   margin: 24px 16px;
-  padding: 24px; 
+  padding: 24px;
   background: #fff;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100% - 48px);
 }
 
 .trigger {

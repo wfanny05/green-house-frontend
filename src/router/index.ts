@@ -18,9 +18,14 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('../views/dashboard-view.vue')
+      path: '/green-house',
+      name: 'green-house',
+      component: () => import('../views/green-house.vue')
+    },
+    {
+      path: '/env-info',
+      name: 'env-info',
+      component: () => import('../views/env-info.vue')
     }
   ]
 })
