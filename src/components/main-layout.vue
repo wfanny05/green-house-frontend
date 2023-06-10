@@ -27,7 +27,7 @@
         <a-breadcrumb>
           <a-breadcrumb-item v-for="item in pageTitle" :key="item">{{ item }}</a-breadcrumb-item>
         </a-breadcrumb>
-        <h1>{{ pageTitle[pageTitle.length - 1] }}</h1>
+        <h1><span v-if="backUrl" class="back" @click="back"><arrow-left-outlined />返回</span> {{ pageTitle[pageTitle.length - 1] }}</h1>
       </div>
       <a-layout-content class="main-layout-content">
         <div class="main-layout-content-inner">
@@ -44,9 +44,10 @@ import {
   UploadOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons-vue';
-import { defineComponent, ref, onMounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, watch, provide } from 'vue';
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 
 interface menuItem {
@@ -64,7 +65,8 @@ export default defineComponent({
     UploadOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    ArrowLeftOutlined
   },
   setup() {
     const router = useRouter()
@@ -142,23 +144,34 @@ export default defineComponent({
     let selectedKeys = ref<string[]>([])
     let openKeys = ref<string[]>([])
     let pageTitle = ref<string[]>([])
+    let backUrl = ref<string>('')
+
+    const back = () => {
+      // console.log(backUrl.value)
+      router.push({
+        path: backUrl.value
+      })
+    }
 
     onMounted(() => {
-      
+
+    })
+
+    provide('pageTitlePush', (title: string, url: string) => {
+      pageTitle.value[2] = title
+      backUrl.value = url
     })
 
     watch(() => route.path, (newValue, oldValue) => {
       console.log(newValue, '新的路由')
       console.log(oldValue, '旧的路由')
       const path = newValue
+      pageTitle.value = []
+      backUrl.value = ''
       menu.forEach((item, index) => {
         const children = item.children || []
         children.forEach((child, index2) => {
-          if (child.path === path) {
-            // setTimeout(() => {
-            //   console.log(selectedKeys.value[0])
-            // }, 0)
-            
+          if (path.indexOf(child.path as string) > -1) {            
             if (!openKeys.value[0]) {
               openKeys.value = [index + '']
             }
@@ -179,6 +192,8 @@ export default defineComponent({
       collapsed: ref<boolean>(false),
       menu,
       pageTitle,
+      back,
+      backUrl
     };
   },
 });
@@ -228,5 +243,9 @@ export default defineComponent({
   height: 32px;
   background: rgba(255, 255, 255, 0.3);
   margin: 16px;
+}
+.back {
+  cursor: pointer;
+  margin-right: 16px;
 }
 </style>

@@ -23,6 +23,11 @@ const router = createRouter({
       component: () => import('../views/green-house.vue')
     },
     {
+      path: '/green-house-form',
+      name: 'green-house-form',
+      component: () => import('../views/green-house-form.vue')
+    },
+    {
       path: '/env-info',
       name: 'env-info',
       component: () => import('../views/env-info.vue')

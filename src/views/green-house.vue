@@ -3,6 +3,7 @@ import { reactive, onBeforeMount, watch, ref, toRefs, computed } from 'vue'
 import axiosInstance from '../utils/axios-instance'
 import { dataFill } from '../utils/mock'
 import type { PaginationProps, FormInstance } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
 
 
 interface DataSourceItem {
@@ -14,37 +15,7 @@ interface DataSourceItem {
   PersonTel: string;
 }
 
-async function greenHouseAdd(item) {
-  const res = await axiosInstance({
-    method: 'post',
-    url: 'http://localhost:6166/green-house/add',
-    data: {
-      item: {
-        greenHouseCode: 'gh_001',
-        greenhouseName: '大棚01',
-        PersonName: '张三',
-        PersonTel: '13888888888',
-      }
-    }
-  })
-  console.log('greenHouseAdd', res)
-}
-
-async function greenHouseUpdate() {
-  const res = await axiosInstance({
-    method: 'post',
-    url: 'http://localhost:6166/green-house/update',
-    data: {
-      id: 2,
-      item: {
-        Category: '蔬菜类',
-        PlantName: '番茄22222277',
-        Stage: '2', // 1 萌发期；2 幼苗期；3 生长期；4 开花期；5 结果期
-      }
-    }
-  })
-  console.log('greenHouseUpdate', res)
-}
+const router = useRouter()
 
 async function greenHouseDelete(id: number, index: number) {
   const res = await axiosInstance({
@@ -201,6 +172,16 @@ const tableChange = async (_pagination: PaginationProps) => {
 
 const alertMsg = computed(() => `大棚数量：${pagination.total}`)
 
+const toFormPage = (id: number | undefined) => {
+  console.log('toFormPage')
+  router.push({
+    path: '/green-house-form',
+    query: {
+      id,
+    }
+  })
+}
+
 onBeforeMount(async () => {
 
 })
@@ -240,7 +221,7 @@ onBeforeMount(async () => {
     </a-form>
 
     <div>
-      <a-button type="primary">新增</a-button>
+      <a-button type="primary" @click="toFormPage(undefined)">新增</a-button>
       <a-button @click="greenHouseMultiDelete">批量删除</a-button>
     </div>
 
@@ -260,7 +241,7 @@ onBeforeMount(async () => {
     >
       <template #bodyCell="{ column, text, record, index }">
         <template v-if="column.dataIndex === 'operation'">
-          <a @click.prevent="greenHouseMultiDelete">编辑</a>
+          <a @click.prevent="toFormPage(record.id)">编辑</a>
           <a-divider type="vertical" />
           <a-popconfirm
             v-if="dataSource.length"
