@@ -5,7 +5,7 @@ export const mockFuncs : { [key :string] : Function } = {
   greenHouse: async () => {
     const item = {
       greenHouseCode: Mock.Random.string('number', 6),
-      greenhouseName: Mock.Random.ctitle(),
+      greenhouseName: Mock.Random.ctitle(6),
       PersonName: Mock.Random.cname(),
       PersonTel: Mock.Random.string('number', 11),
       Region: Mock.Random.region(),
