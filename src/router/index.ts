@@ -31,7 +31,47 @@ const router = createRouter({
       path: '/env-info',
       name: 'env-info',
       component: () => import('../views/env-info.vue')
-    }
+    },
+    {
+      path: '/seed-list',
+      name: 'seed-list',
+      component: () => import('../views/seed-list.vue')
+    },
+    {
+      path: '/seed-image',
+      name: 'seed-image',
+      component: () => import('../views/seed-image.vue')
+    },
+    {
+      path: '/plant-list',
+      name: 'plant-list',
+      component: () => import('../views/plant-list.vue')
+    },
+    {
+      path: '/plant-irrigation',
+      name: 'plant-irrigation',
+      component: () => import('../views/plant-irrigation.vue')
+    },
+    {
+      path: '/plant-fertilize',
+      name: 'plant-fertilize',
+      component: () => import('../views/plant-fertilize.vue')
+    },
+    {
+      path: '/plant-pesticide',
+      name: 'plant-pesticide',
+      component: () => import('../views/plant-pesticide.vue')
+    },
+    {
+      path: '/plant-disease',
+      name: 'plant-disease',
+      component: () => import('../views/plant-disease.vue')
+    },
+    {
+      path: '/sensor-list',
+      name: 'sensor-list',
+      component: () => import('../views/sensor-list.vue')
+    },
   ]
 })
 

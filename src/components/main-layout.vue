@@ -3,13 +3,13 @@
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
       <div class="logo" />
       <a-menu  v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" theme="dark" mode="inline">
-        <a-sub-menu v-for="(item, index) in menu" :key="index+''">
+        <a-sub-menu v-for="(item, index) in menu" :key="`${index}`">
           <template #icon>
             <component :is="item.icon" />
           </template>
           <template #title>{{ item.title }}</template>
-          <a-menu-item v-for="(child, index2) in item.children" :key="index2+''">
-            <RouterLink :to="child.path as string">{{ child.title }}</RouterLink>
+          <a-menu-item v-for="(child, index2) in item.children" :key="`${index}-${index2}`">
+            <RouterLink :to="child.path as string">{{ child.title }}{{ `${index}-${index2}` }}</RouterLink>
           </a-menu-item>
         </a-sub-menu>
       </a-menu>
@@ -86,60 +86,60 @@ export default defineComponent({
           }
         ]
       },
-      // {
-      //   title: '​种子管理',
-      //   icon: 'AppstoreOutlined',
-      //   children: [
-      //     {
-      //       title: '种子列表',
-      //       path: '/seed'
-      //     },
-      //     {
-      //       title: '​​图片管理',
-      //       path: '/seed-image'
-      //     }
-      //   ]
-      // },
-      // {
-      //   title: '​作物管理',
-      //   icon: 'AppstoreOutlined',
-      //   children: [
-      //     {
-      //       title: '实时信息',
-      //       path: '/crop-latest'
-      //     },
-      //     {
-      //       title: '作物列表',
-      //       path: '/crop'
-      //     },
-      //     {
-      //       title: '​​灌溉记录',
-      //       path: '/crop-irrigation'
-      //     },
-      //     {
-      //       title: '​​施肥记录',
-      //       path: '/crop-fertilize'
-      //     },
-      //     {
-      //       title: '​​农药记录',
-      //       path: '/crop-pesticide'
-      //     },
-      //     {
-      //       title: '​​病虫害记录',
-      //       path: '/crop-disease'
-      //     },
-      //   ]
-      // },
-      // {
-      //   title: '​设备管理',
-      //   icon: 'AppstoreOutlined',
-      //   children: [
-      //     {
-      //       title: '传感器列表',
-      //       path: '/sensor'
-      //     },
-      //   ]
-      // }
+      {
+        title: '​种子管理',
+        icon: 'AppstoreOutlined',
+        children: [
+          {
+            title: '种子列表',
+            path: '/seed-list'
+          },
+          {
+            title: '​​图片管理',
+            path: '/seed-image'
+          }
+        ]
+      },
+      {
+        title: '​作物管理',
+        icon: 'AppstoreOutlined',
+        children: [
+          // {
+          //   title: '实时信息',
+          //   path: '/plant-latest'
+          // },
+          {
+            title: '作物列表',
+            path: '/plant-list'
+          },
+          {
+            title: '​​灌溉记录',
+            path: '/plant-irrigation'
+          },
+          {
+            title: '​​施肥记录',
+            path: '/plant-fertilize'
+          },
+          {
+            title: '​​农药记录',
+            path: '/plant-pesticide'
+          },
+          {
+            title: '​​病虫害记录',
+            path: '/plant-disease'
+          },
+        ]
+      },
+      {
+        title: '​设备管理',
+        icon: 'AppstoreOutlined',
+        children: [
+          {
+            title: '传感器列表',
+            path: '/sensor-list'
+          },
+        ]
+      }
     ]
     let selectedKeys = ref<string[]>([])
     let openKeys = ref<string[]>([])
@@ -173,12 +173,12 @@ export default defineComponent({
         children.forEach((child, index2) => {
           if (path.indexOf(child.path as string) > -1) {            
             if (!openKeys.value[0]) {
-              openKeys.value = [index + '']
+              openKeys.value = [`${index}`]
             }
             if (!selectedKeys.value[0]) {
-              selectedKeys.value = [index2 + '']
+              selectedKeys.value = [`${index }-${index2}`]
             }
-
+            // console.log(openKeys.value, selectedKeys.value)
             pageTitle.value[0] = item.title
             pageTitle.value[1] = child.title
           }
