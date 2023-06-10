@@ -19,7 +19,27 @@ export const mockFuncs : { [key :string] : Function } = {
         item
       }
     })
-  }
+  },
+  envInfo: async () => {
+    const item = {
+      GreenhouseCode: 51,
+      RecordDate: Mock.Random.datetime('yyyy-MM-dd HH:mm:ss'),
+      AirTemp: Mock.Random.integer(0, 40),
+      AirHumidity: Mock.Random.integer(0, 100),
+      SoilTemp: Mock.Random.integer(0, 40),
+      SoilHumidity: Mock.Random.integer(0, 100),
+      CarbonDioxideLevel: Mock.Random.integer(500, 800),
+      Illuminance: Mock.Random.integer(100, 2000),
+    }
+    // console.log(11, item)
+    const res = await axiosInstance({
+      method: 'post',
+      url: 'http://localhost:6166/env-info/add',
+      data: {
+        item
+      }
+    })
+  },
 }
 
 export const dataFill = (count: number, name: string) => {

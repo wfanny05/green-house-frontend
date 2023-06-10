@@ -4,13 +4,6 @@ import axiosInstance from '../utils/axios-instance'
 import { useRouter, useRoute } from 'vue-router'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue';
-import {
-  HomeOutlined,
-  SettingFilled,
-  SmileOutlined,
-  SyncOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons-vue';
 
 const router = useRouter()
 const route = useRoute()
