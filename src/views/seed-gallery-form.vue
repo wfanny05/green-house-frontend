@@ -138,7 +138,7 @@ const numberValidator = (rule: any) => {
 
 const goBack = () => {
   router.push({
-    path: '/seed-list',
+    path: '/seed-gallery',
   })
 }
 let isEdit = ref(false)
@@ -152,8 +152,8 @@ const cancelEdit = () => {
 
 
 const pageTitlePush = inject('pageTitlePush') as (title: string, url: string) => void
-const title = route.query.edit == '1' ? '编辑种子' : seedId.value ? '种子详情': '新增种子'
-pageTitlePush(title, '/seed-list')
+const title = route.query.edit == '1' ? '编辑图集' : seedId.value ? '图集详情': '新增图集'
+pageTitlePush(title, '/seed-gallery')
 
 
 if (seedId.value) {
@@ -407,7 +407,7 @@ onBeforeMount(async () => {
       <a-col :span="12">
         <a-form-item
           name="Pictures"
-          label="关联图集"
+          label="图片集"
         >
           <a-input v-if="isEdit" v-model:value="formState.Pictures" placeholder=""></a-input>
           <div v-else>{{ formState.Pictures }}</div>

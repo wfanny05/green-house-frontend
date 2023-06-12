@@ -59,6 +59,20 @@ export const mockFuncs : { [key :string] : Function } = {
       }
     })
   },
+  seedGallery: async () => {
+    const item = {
+      PictureName: Mock.Random.ctitle(4),
+      PictureDescription: Mock.Random.csentence(10, 20),
+    }
+    // console.log(11, item)
+    const res = await axiosInstance({
+      method: 'post',
+      url: 'http://localhost:6166/seed-gallery/add',
+      data: {
+        item
+      }
+    })
+  },
 }
 
 export const dataFill = (count: number, name: string) => {

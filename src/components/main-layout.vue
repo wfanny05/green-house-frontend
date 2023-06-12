@@ -96,7 +96,7 @@ export default defineComponent({
           },
           {
             title: '​​图片管理',
-            path: '/seed-image'
+            path: '/seed-gallery'
           }
         ]
       },
