@@ -9,7 +9,7 @@
           </template>
           <template #title>{{ item.title }}</template>
           <a-menu-item v-for="(child, index2) in item.children" :key="`${index}-${index2}`">
-            <RouterLink :to="child.path as string">{{ child.title }}{{ `${index}-${index2}` }}</RouterLink>
+            <RouterLink :to="child.path as string">{{ child.title }}</RouterLink>
           </a-menu-item>
         </a-sub-menu>
       </a-menu>

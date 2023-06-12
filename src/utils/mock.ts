@@ -40,6 +40,25 @@ export const mockFuncs : { [key :string] : Function } = {
       }
     })
   },
+  seed: async () => {
+    const item = {
+      PlantName: Mock.Random.ctitle(6),
+      Category: Mock.Random.ctitle(4),
+      Supplier: Mock.Random.ctitle(6),
+      SupplierTel: Mock.Random.string('number', 11),
+      Pictures: 1, // 图片集id
+      Measures: Mock.Random.cparagraph(8), // 技术措施
+      Note: Mock.Random.cparagraph(6),
+    }
+    // console.log(11, item)
+    const res = await axiosInstance({
+      method: 'post',
+      url: 'http://localhost:6166/seed/add',
+      data: {
+        item
+      }
+    })
+  },
 }
 
 export const dataFill = (count: number, name: string) => {

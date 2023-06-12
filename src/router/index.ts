@@ -38,6 +38,11 @@ const router = createRouter({
       component: () => import('../views/seed-list.vue')
     },
     {
+      path: '/seed-list-form',
+      name: 'seed-list-form',
+      component: () => import('../views/seed-list-form.vue')
+    },
+    {
       path: '/seed-image',
       name: 'seed-image',
       component: () => import('../views/seed-image.vue')

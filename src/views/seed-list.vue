@@ -7,65 +7,65 @@ import { useRouter } from 'vue-router'
 
 
 interface DataSourceItem {
-  key: number;
-  id: number;
-  greenHouseCode: string;
-  greenhouseName: string;
-  PersonName: string;
-  PersonTel: string;
+  key: number
+  id: number
+  PlantName: string
+  Category: string
+  Supplier: string
+  SupplierTel: string
 }
 
 const router = useRouter()
 
-async function greenHouseDelete(id: number, index: number) {
+async function seedDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/del',
+    url: 'http://localhost:6166/seed/del',
     data: {
       id
     }
   })
-  console.log('greenHouseDelete', res)
+  console.log('seedDelete', res)
   if (dataSource.value.length === 1 && pagination.current > 1) {
     console.log(123, pagination.current)
     pagination.current--
-    await greenHouseQuery()
+    await seedQuery()
   } else if (dataSource.value.length < pagination.pageSize) {
     dataSource.value.splice(index, 1)
   } else {
-    await greenHouseQuery()
+    await seedQuery()
   }
 }
 
-async function greenHouseMultiDelete() {
+async function seedMultiDelete() {
   const ids = tableState.selectedRowKeys.join(',')
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/multi-del',
+    url: 'http://localhost:6166/seed/multi-del',
     data: {
       ids
     }
   })
-  console.log('greenHouseMultiDelete', res)
+  console.log('seedMultiDelete', res)
    if (dataSource.value.length === tableState.selectedRowKeys.length && pagination.current > 1) {
     console.log(1234, pagination.current)
     pagination.current--
   } 
-  await greenHouseQuery()
+  await seedQuery()
 }
 
-const greenHouseQuery = async () => {
+const seedQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/page',
+    url: 'http://localhost:6166/seed/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
       ...formState
     }
   })
-  console.log('greenHouseQuery', res.data)
+  console.log('seedQuery', res.data)
   pagination.total = res.data.data.total
   dataSource.value = (res.data.data.list as DataSourceItem[]).map(item => {
     item.key = item.id
@@ -77,52 +77,42 @@ const greenHouseQuery = async () => {
 
 const formRef = ref<FormInstance>();
 const formState = reactive({
-  greenHouseCode: '',
-  greenhouseName: ''
+  PlantName: '',
+  Supplier: ''
 });
 const onFinish = (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', formState);
   pagination.current = 1
-  greenHouseQuery()
+  seedQuery()
 };
 const onReset = () => {
   (formRef.value as FormInstance).resetFields()
   pagination.current = 1
-  greenHouseQuery()
+  seedQuery()
 }
 
 let dataSource = ref<DataSourceItem[]>([])
 const columns = [
   {
-    title: '大棚编号',
-    dataIndex: 'greenHouseCode',
-    key: 'greenHouseCode',
+    title: '种子名称',
+    dataIndex: 'PlantName',
+    key: 'PlantName',
   },
   {
-    title: '大棚名称',
-    dataIndex: 'greenhouseName',
-    key: 'greenhouseName',
+    title: '品种',
+    dataIndex: 'Category',
+    key: 'Category',
   },
   {
-    title: '大棚地址',
-    dataIndex: 'Region',
-    key: 'Region',
+    title: '供应商',
+    dataIndex: 'Supplier',
+    key: 'Supplier',
   },
   {
-    title: '负责人',
-    dataIndex: 'PersonName',
-    key: 'PersonName',
-  },
-  {
-    title: '负责人手机',
-    dataIndex: 'PersonTel',
-    key: 'PersonTel',
-  },
-  {
-    title: '​所属机构',
-    dataIndex: 'Institution',
-    key: 'Institution',
+    title: '供应商电话',
+    dataIndex: 'SupplierTel',
+    key: 'SupplierTel',
   },
   {
     title: '操作',
@@ -153,11 +143,7 @@ const tableState = reactive<{
   loading: false,
 });
 
-await greenHouseQuery() 
-
-// watch(() => pagination, () => {
-//   console.log('current', pagination.current);
-// }, { deep: true });
+await seedQuery() 
 
 const onSelectChange = (selectedRowKeys: number[]) => {
   console.log('selectedRowKeys changed: ', selectedRowKeys);
@@ -167,17 +153,18 @@ const onSelectChange = (selectedRowKeys: number[]) => {
 const tableChange = async (_pagination: PaginationProps) => {
   console.log('tableChange', _pagination);
   pagination.current = _pagination.current as number
-  await greenHouseQuery()
+  await seedQuery()
 }
 
-const alertMsg = computed(() => `大棚数量：${pagination.total}`)
+const alertMsg = computed(() => `种子数量：${pagination.total}`)
 
-const toFormPage = (id: number | undefined) => {
+const toFormPage = (id: number | undefined, isEdit: Boolean = false) => {
   console.log('toFormPage')
   router.push({
-    path: '/green-house-form',
+    path: '/seed-list-form',
     query: {
       id,
+      edit: isEdit ? 1 : 0
     }
   })
 }
@@ -199,18 +186,18 @@ onBeforeMount(async () => {
       <a-row :gutter="24">
         <a-col :span="8">
           <a-form-item
-            name="greenHouseCode"
-            label="大棚编号"
+            name="PlantName"
+            label="种子名称"
           >
-            <a-input v-model:value="formState.greenHouseCode" placeholder=""></a-input>
+            <a-input v-model:value="formState.PlantName" placeholder=""></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="8">
           <a-form-item
-            name="greenhouseName"
-            label="大棚名称"
+            name="Supplier"
+            label="供应商"
           >
-            <a-input v-model:value="formState.greenhouseName" placeholder=""></a-input>
+            <a-input v-model:value="formState.Supplier" placeholder=""></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -222,15 +209,12 @@ onBeforeMount(async () => {
 
     <div>
       <a-button type="primary" @click="toFormPage(undefined)">新增</a-button>
-      <a-button @click="greenHouseMultiDelete">批量删除</a-button>
+      <a-button @click="seedMultiDelete">批量删除</a-button>
     </div>
 
     <a-alert :message="alertMsg" type="info" show-icon />
 
-    <a-button @click="dataFill(3, 'greenHouse')">Add</a-button>
-    <!-- <a-button @click="greenHouseDelete">Delete</a-button>
-    <a-button @click="greenHouseUpdate">Update</a-button>
-    <a-button @click="greenHouseQuery">Query</a-button> -->
+    <a-button @click="dataFill(3, 'seed')">Add</a-button>
 
     <a-table 
       :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"
@@ -241,15 +225,9 @@ onBeforeMount(async () => {
     >
       <template #bodyCell="{ column, text, record, index }">
         <template v-if="column.dataIndex === 'operation'">
-          <a @click.prevent="toFormPage(record.id)">编辑</a>
+          <a @click.prevent="toFormPage(record.id)">查看详情</a>
           <a-divider type="vertical" />
-          <a-popconfirm
-            v-if="dataSource.length"
-            title="Sure to delete?"
-            @confirm="greenHouseDelete(record.id, index)"
-          >
-            <a>删除</a>
-          </a-popconfirm>
+          <a @click.prevent="toFormPage(record.id, true)">编辑</a>
         </template>
       </template>
   </a-table>
