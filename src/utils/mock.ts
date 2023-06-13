@@ -46,7 +46,7 @@ export const mockFuncs : { [key :string] : Function } = {
       Category: Mock.Random.ctitle(4),
       Supplier: Mock.Random.ctitle(6),
       SupplierTel: Mock.Random.string('number', 11),
-      Pictures: 1, // 图片集id
+      Pictures: '', // 图集id
       Measures: Mock.Random.cparagraph(8), // 技术措施
       Note: Mock.Random.cparagraph(6),
     }
