@@ -5,7 +5,8 @@ import { useRouter, useRoute } from 'vue-router'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue';
 import {
-  UploadOutlined
+  UploadOutlined,
+  FormOutlined
 } from '@ant-design/icons-vue';
 
 const router = useRouter()
@@ -19,6 +20,7 @@ interface FormState {
   [key: string]: any
 }
 interface ImageFormState {
+  checked?: boolean
   id?: number
   PictureName: string
   PictureDescription: string
@@ -65,7 +67,7 @@ async function seedUpdate() {
   console.log('seedUpdate', res)
 }
 
-async function seedImageAdd() {
+async function seedImageAdd(): Promise<ImageFormState> {
   var formData = new FormData()
   for (var i = 0; i < imageFormState.fileList.length; i++) {
     formData.append("fileList", imageFormState.fileList[i]);
@@ -81,9 +83,52 @@ async function seedImageAdd() {
     data: formData,
   })
   console.log('seedImageAdd', res)
+  return res.data?.data || {}
 }
 
-async function seedImageQuery(PictureSetID: number): Promise<FormState> {
+async function seedImageUpdate(): Promise<ImageFormState> {
+  var formData = new FormData()
+  for (var i = 0; i < imageFormState.fileList.length; i++) {
+    formData.append("fileList", imageFormState.fileList[i]);
+  }
+  formData.append('id', editImageId+'')
+  formData.append('PictureName', imageFormState.PictureName)
+  formData.append('PictureDescription', imageFormState.PictureDescription)
+  formData.append('PictureType', imageFormState.PictureType)
+  formData.append('PictureSetID', seedGalleryId.value)
+  const res = await axiosInstance({
+    method: 'post',
+    url: 'http://localhost:6166/seed-image/update',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data: formData,
+  })
+  console.log('seedImageUpdate', res)
+  return res.data?.data || {}
+}
+
+async function seedImageMultiDelete() {
+  const ids = imageList.value.filter(item => item.checked).map(item => item.id).join(',')
+  if(!ids) {
+    message.error('请选择要删除的图片');
+    return
+  }
+  // console.log(111, ids)
+  const res = await axiosInstance({
+    method: 'post',
+    url: 'http://localhost:6166/seed-image/multi-del',
+    data: {
+      ids
+    }
+  })
+  console.log('seedImageMultiDelete', res)
+  // if (dataSource.value.length === tableState.selectedRowKeys.length && pagination.current > 1) {
+  //   console.log(1234, pagination.current)
+  //   pagination.current--
+  // } 
+  await detailGet()
+}
+
+async function seedImageQuery(PictureSetID: number): Promise<ImageFormState[]> {
   const res = await axiosInstance({
     method: 'post',
     url: 'http://localhost:6166/seed-image/page',
@@ -104,14 +149,21 @@ const detailGet = async () => {
       formState[key] = res[key]
     })
     const list = await seedImageQuery(res.id)
-    
-
+    imageList.value = list.map(item => ({
+      ...item,
+      checked: false,
+    }))
   }
 }
 
-
 let seedGalleryId = ref<string>(route.query.id as string)
-
+let isEdit = ref(false)
+const toEdit = () => {
+  isEdit.value = true
+}
+const cancelEdit = () => {
+  isEdit.value = false
+}
 const formRef = ref<FormInstance>();
 const formState = reactive<FormState>({
   PictureName: '',
@@ -121,26 +173,13 @@ const onFinish = async (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', formState);
   await seedUpdate()
-  if(seedGalleryId.value) {
-  //   await seedUpdate()
-    message.success('更新成功！');
-  } else {
-    // await seedUpdate()
-    message.success('新增成功！');
-  }
+  message.success('更新成功！');
 };
 
 const goBack = () => {
   router.push({
     path: '/seed-gallery',
   })
-}
-let isEdit = ref(false)
-const toEdit = () => {
-  isEdit.value = true
-}
-const cancelEdit = () => {
-  isEdit.value = false
 }
 
 const imageFormRef = ref<FormInstance>();
@@ -150,18 +189,24 @@ const imageFormState = reactive<ImageFormState>({
   PictureType: '',
   fileList: [],
 });
-let isAddImage = ref(false)
+let isEditImage = ref(false)
+let editImageId: number | undefined
 const addImage = () => {
-  isAddImage.value = true
+  isEditImage.value = true
+  editImageId = undefined
+  imageFormState.PictureName = ''
+  imageFormState.PictureDescription = ''
 }
 const cancelAddImage = () => {
-  isAddImage.value = false
+  isEditImage.value = false
 }
 const loading = ref<boolean>(false);
-const handleAddImage = () => {
+const handleEditImage = async () => {
   const form = imageFormRef.value as FormInstance;
-  form.validate().then(() => {
-    seedImageAdd()
+  form.validate().then(async () => {
+    const res =  editImageId ? (await seedImageUpdate()): (await seedImageAdd())
+    detailGet()
+    isEditImage.value = false
   }).catch(err => {
     console.log('error', err);
   });
@@ -171,13 +216,33 @@ const beforeUpload = (file: any) => {
   imageFormState.fileList = [file];
   return false
 }
+const updateImage = (item: ImageFormState) => {
+  isEditImage.value = true
+  editImageId = item.id
+  imageFormState.PictureName = item.PictureName
+  imageFormState.PictureDescription = item.PictureDescription
+}
+let imageList = ref<ImageFormState[]>([])
+const onImageCheck = (index: number) => {
+  console.log('onImageCheck', index, imageList.value[index].checked )
+}
 
-const imageList = ref<ImageFormState[]>([])
+const selectAll = () => {
+  imageList.value.forEach(item => {
+    item.checked = true
+  })
+}
+const selectNone = () => {
+  imageList.value.forEach(item => {
+    item.checked = false
+  })
+}
+
+
 
 const pageTitlePush = inject('pageTitlePush') as (title: string, url: string) => void
 const title = '图集详情'
 pageTitlePush(title, '/seed-gallery')
-
 
 detailGet()
 
@@ -227,15 +292,35 @@ onBeforeMount(async () => {
 
     <div class="image-action">
       <a-button type="primary" @click="addImage">新增图片</a-button>
-      <a-button @click="toEdit">删除图片</a-button>
-      <a-button @click="toEdit">全 选</a-button>
-      <a-button @click="toEdit">取消选中</a-button>
+      <a-button @click="seedImageMultiDelete">删除图片</a-button>
+      <a-button @click="selectAll" >全 选</a-button>
+      <a-button @click="selectNone">取消选中</a-button>
     </div>
+    <a-row :gutter="24">
+      <a-col :span="4" v-for="(item, index) in imageList" :key="item.id" class="gallery-image">
+        <a-card hoverable>
+          <template #cover>
+            <div class="cover-wrapper">
+              <a-checkbox
+                v-model:checked="item.checked"
+                @change="onImageCheck(index)"
+              >
+              </a-checkbox>
+              <form-outlined @click="updateImage(item)"/>
+              <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+            </div>
+          </template>
+          <a-card-meta :title="item.PictureName">
+            <template #description>{{ item.PictureDescription }}</template>
+          </a-card-meta>
+        </a-card>
+      </a-col>
+    </a-row>
 
-    <a-modal v-model:visible="isAddImage" title="新增图片" @ok="handleAddImage">
+    <a-modal v-model:visible="isEditImage" title="新增图片">
       <template #footer>
         <a-button key="back" @click="cancelAddImage">取 消</a-button>
-        <a-button key="submit" type="primary" :loading="loading" @click="handleAddImage">提 交</a-button>
+        <a-button key="submit" type="primary" :loading="loading" @click="handleEditImage">提 交</a-button>
       </template>
       <a-form
         ref="imageFormRef"
@@ -260,7 +345,7 @@ onBeforeMount(async () => {
         <a-form-item
           name="fileList"
           label="图片"
-          :rules="[{ required: true, message: '请输入上传图片!' }]"
+          :rules="[{ required: !editImageId, message: '请输入上传图片!' }]"
         >
           <a-upload :file-list="imageFormState.fileList" :before-upload="beforeUpload">
             <a-button>
@@ -278,16 +363,41 @@ onBeforeMount(async () => {
 .seed-gallery-form {
   position: relative;
 }
+.cover-wrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+.cover-wrapper  > .ant-checkbox-wrapper {
+  position: absolute;
+  top: 0;
+  left: 5px;
+}
+.cover-wrapper  > .anticon-form {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 20px;
+  color: #fff;
+}
+.cover-wrapper  > img {
+  width: 100%;
+}
 .action {
   position: absolute;
   top: 0;
   right: 0;
 }
-
 .action .ant-btn {
   margin-left: 8px;
 }
-
+.image-action {
+  margin-bottom: 24px;
+}
+.image-action .ant-btn {
+  margin-right: 8px;
+}
 .form-title {
   font-size: 16px;
   font-weight: bold;
