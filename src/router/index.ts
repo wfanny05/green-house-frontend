@@ -58,6 +58,11 @@ const router = createRouter({
       component: () => import('../views/plant-list.vue')
     },
     {
+      path: '/plant-list-form',
+      name: 'plant-list-form',
+      component: () => import('../views/plant-list-form.vue')
+    },
+    {
       path: '/plant-irrigation',
       name: 'plant-irrigation',
       component: () => import('../views/plant-irrigation.vue')

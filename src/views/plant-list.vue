@@ -5,124 +5,154 @@ import { dataFill } from '../utils/mock'
 import type { PaginationProps, FormInstance } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 
-
 interface DataSourceItem {
   key: number;
   id: number;
-  greenHouseCode: string;
-  greenhouseName: string;
-  PersonName: string;
-  PersonTel: string;
+  PlantName: string;
+  seedName: string;
+  greenHouseName: string;
+  PlantedDate: string;
+  Days: number;
+  PlantStatus: string;
+  PlantStatusName: string;
+  HarvestDate: string
+  isHarvest: boolean;
 }
 
 const router = useRouter()
 
-async function greenHouseDelete(id: number, index: number) {
+async function plantDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/del',
+    url: 'http://localhost:6166/plant/del',
     data: {
       id
     }
   })
-  console.log('greenHouseDelete', res)
+  console.log('plantDelete', res)
   if (dataSource.value.length === 1 && pagination.current > 1) {
     console.log(123, pagination.current)
     pagination.current--
-    await greenHouseQuery()
+    await plantQuery()
   } else if (dataSource.value.length < pagination.pageSize) {
     dataSource.value.splice(index, 1)
   } else {
-    await greenHouseQuery()
+    await plantQuery()
   }
 }
 
-async function greenHouseMultiDelete() {
+async function plantMultiDelete() {
   const ids = tableState.selectedRowKeys.join(',')
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/multi-del',
+    url: 'http://localhost:6166/plant/multi-del',
     data: {
       ids
     }
   })
-  console.log('greenHouseMultiDelete', res)
+  console.log('plantMultiDelete', res)
    if (dataSource.value.length === tableState.selectedRowKeys.length && pagination.current > 1) {
     console.log(1234, pagination.current)
     pagination.current--
   } 
-  await greenHouseQuery()
+  await plantQuery()
 }
 
-const greenHouseQuery = async () => {
+const plantQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/page',
+    url: 'http://localhost:6166/plant/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
       ...formState
     }
   })
-  console.log('greenHouseQuery', res.data)
+  console.log('plantQuery', res.data)
   pagination.total = res.data.data.total
   dataSource.value = (res.data.data.list as DataSourceItem[]).map(item => {
     item.key = item.id
+    const i = Number(item.PlantStatus) - 1
+    item.PlantStatusName = PlantStatusArr[i].label
+    item.isHarvest = !item.HarvestDate
     return item
   })
   return res.data
 }
 
+const PlantStatusArr = [{
+  label: '萌发期',
+  value: 1
+}, {
+  label: '幼苗期',
+  value: 2
+}, {
+  label: '生长期',
+  value: 3
+}, {
+  label: '开花期',
+  value: 4
+}, {
+  label: '结果期',
+  value: 5
+}]
 
 const formRef = ref<FormInstance>();
 const formState = reactive({
-  greenHouseCode: '',
-  greenhouseName: ''
+  PlantName: '',
+  seedName: '',
+  greenHouseName: '',
+
 });
 const onFinish = (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', formState);
   pagination.current = 1
-  greenHouseQuery()
+  plantQuery()
 };
 const onReset = () => {
   (formRef.value as FormInstance).resetFields()
   pagination.current = 1
-  greenHouseQuery()
+  plantQuery()
 }
 
 let dataSource = ref<DataSourceItem[]>([])
 const columns = [
   {
-    title: '大棚编号',
-    dataIndex: 'greenHouseCode',
-    key: 'greenHouseCode',
+    title: '作物名称',
+    dataIndex: 'PlantName',
+    key: 'PlantName',
+  },
+  {
+    title: '种子名称',
+    dataIndex: 'seedName',
+    key: 'seedName',
   },
   {
     title: '大棚名称',
-    dataIndex: 'greenhouseName',
-    key: 'greenhouseName',
+    dataIndex: 'greenHouseName',
+    key: 'greenHouseName',
   },
   {
-    title: '大棚地址',
-    dataIndex: 'Region',
-    key: 'Region',
+    title: '播种时间',
+    dataIndex: 'PlantedDate',
+    key: 'PlantedDate',
   },
   {
-    title: '负责人',
-    dataIndex: 'PersonName',
-    key: 'PersonName',
+    title: '生长天数',
+    dataIndex: 'Days',
+    key: 'Days',
   },
   {
-    title: '负责人手机',
-    dataIndex: 'PersonTel',
-    key: 'PersonTel',
+    title: '作物状态',
+    dataIndex: 'PlantStatusName',
+    key: 'PlantStatusName',
   },
   {
-    title: '​所属机构',
-    dataIndex: 'Institution',
-    key: 'Institution',
+    title: '收获完成',
+    dataIndex: 'isHarvest',
+    key: 'isHarvest',
   },
   {
     title: '操作',
@@ -153,7 +183,7 @@ const tableState = reactive<{
   loading: false,
 });
 
-await greenHouseQuery() 
+await plantQuery() 
 
 // watch(() => pagination, () => {
 //   console.log('current', pagination.current);
@@ -167,15 +197,13 @@ const onSelectChange = (selectedRowKeys: number[]) => {
 const tableChange = async (_pagination: PaginationProps) => {
   console.log('tableChange', _pagination);
   pagination.current = _pagination.current as number
-  await greenHouseQuery()
+  await plantQuery()
 }
-
-const alertMsg = computed(() => `大棚数量：${pagination.total}`)
 
 const toFormPage = (id: number | undefined) => {
   console.log('toFormPage')
   router.push({
-    path: '/green-house-form',
+    path: '/plant-list-form',
     query: {
       id,
     }
@@ -192,27 +220,51 @@ onBeforeMount(async () => {
     <a-form
       ref="formRef"
       name="advanced_search"
-      class="ant-advanced-search-form"
       :model="formState"
       @finish="onFinish"
     >
       <a-row :gutter="24">
         <a-col :span="8">
           <a-form-item
-            name="greenHouseCode"
-            label="大棚编号"
+            name="plantCode"
+            label="作物名称"
           >
-            <a-input v-model:value="formState.greenHouseCode" placeholder=""></a-input>
+            <a-input v-model:value="formState.PlantName" placeholder=""></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="8">
           <a-form-item
-            name="greenhouseName"
-            label="大棚名称"
+            name="seedName"
+            label="种子名称"
           >
-            <a-input v-model:value="formState.greenhouseName" placeholder=""></a-input>
+            <a-input v-model:value="formState.seedName" placeholder=""></a-input>
           </a-form-item>
         </a-col>
+        <a-col :span="8"></a-col>
+        <a-col :span="8">
+          <a-form-item
+            name="greenHouseName"
+            label="大棚名称"
+          >
+            <a-input v-model:value="formState.greenHouseName" placeholder=""></a-input>
+          </a-form-item>
+        </a-col>
+        <!-- <a-col :span="8">
+          <a-form-item
+            name="PlantedDate"
+            label="播种时间"
+          >
+            <a-input v-model:value="formState.PlantedDate" placeholder=""></a-input>
+          </a-form-item>
+        </a-col> -->
+        <!-- <a-col :span="8">
+          <a-form-item
+            name="PlantStatus"
+            label="作物状态"
+          >
+            <a-input v-model:value="formState.PlantStatus" placeholder=""></a-input>
+          </a-form-item>
+        </a-col> -->
         <a-col :span="8">
           <a-button type="primary" html-type="submit">搜索</a-button>
           <a-button style="margin: 0 8px" @click="onReset">重置</a-button>
@@ -222,15 +274,10 @@ onBeforeMount(async () => {
 
     <div>
       <a-button type="primary" @click="toFormPage(undefined)">新增</a-button>
-      <a-button @click="greenHouseMultiDelete">批量删除</a-button>
+      <a-button @click="plantMultiDelete">批量删除</a-button>
     </div>
 
-    <a-alert :message="alertMsg" type="info" show-icon />
-
-    <a-button @click="dataFill(3, 'greenHouse')">Add</a-button>
-    <!-- <a-button @click="greenHouseDelete">Delete</a-button>
-    <a-button @click="greenHouseUpdate">Update</a-button>
-    <a-button @click="greenHouseQuery">Query</a-button> -->
+    <a-button @click="dataFill(3, 'plant')">Add</a-button>
 
     <a-table 
       :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"
@@ -240,16 +287,11 @@ onBeforeMount(async () => {
       @change="tableChange" 
     >
       <template #bodyCell="{ column, text, record, index }">
+        <template v-if="column.dataIndex === 'isHarvest'">
+        {{ record.isHarvest ? '是' : '否'  }}
+        </template>
         <template v-if="column.dataIndex === 'operation'">
-          <a @click.prevent="toFormPage(record.id)">编辑</a>
-          <a-divider type="vertical" />
-          <a-popconfirm
-            v-if="dataSource.length"
-            title="Sure to delete?"
-            @confirm="greenHouseDelete(record.id, index)"
-          >
-            <a>删除</a>
-          </a-popconfirm>
+          <a @click.prevent="toFormPage(record.id)">查看详情</a>
         </template>
       </template>
   </a-table>

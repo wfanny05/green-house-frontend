@@ -73,6 +73,27 @@ export const mockFuncs : { [key :string] : Function } = {
       }
     })
   },
+  plant: async () => {
+    const item = {
+      PlantName: Mock.Random.ctitle(6),
+      GreenhouseCode: 54, // 大棚id
+      PlantCode: 10, // 种子id
+      Area_m2: Mock.Random.string('number', 3), 
+      PlantedDate: Mock.Random.datetime('yyyy-MM-dd HH:mm:ss'), // 播种时间
+      Days: Mock.Random.integer(0, 100), // 生长天数
+      PlantStatus: '1', // 生长状态: 1 萌发期；2 幼苗期；3 生长期；4 开花期；5 结果期
+      HarvestDate: Mock.Random.datetime('yyyy-MM-dd HH:mm:ss'), // 收获时间
+      Output: Mock.Random.string('number', 4), // 产量
+    }
+    // console.log(11, item)
+    const res = await axiosInstance({
+      method: 'post',
+      url: 'http://localhost:6166/plant/add',
+      data: {
+        item
+      }
+    })
+  },
 }
 
 export const dataFill = (count: number, name: string) => {
