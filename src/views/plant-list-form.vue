@@ -12,8 +12,6 @@ import {
 const router = useRouter()
 const route = useRoute()
 
-const backendUrl = 'http://localhost:6166'
-
 interface FormState { 
   PlantName: string;
   seedName: string;
@@ -39,12 +37,12 @@ interface ImageFormState {
   [key: string]: any
 }
 
-// http://localhost:6166/static/img/16866789713804046.jpg
+// /static/img/16866789713804046.jpg
 
 async function plantGet() : Promise<FormState>{
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant/get',
+    url: '/plant/get',
     data: {
       id: plantId.value
     }
@@ -64,7 +62,7 @@ async function plantUpdate() {
   }
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant/update',
+    url: '/plant/update',
     data: {
       id: plantId.value,
       item,
@@ -86,7 +84,7 @@ async function plantImageAdd(): Promise<ImageFormState> {
   formData.append('plantId', plantId.value)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant-image/add',
+    url: '/plant-image/add',
     headers: { 'Content-Type': 'multipart/form-data' },
     data: formData,
   })
@@ -105,7 +103,7 @@ async function plantImageUpdate(): Promise<ImageFormState> {
   formData.append('plantId', plantId.value)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant-image/update',
+    url: '/plant-image/update',
     headers: { 'Content-Type': 'multipart/form-data' },
     data: formData,
   })
@@ -122,7 +120,7 @@ async function plantImageMultiDelete() {
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant-image/multi-del',
+    url: '/plant-image/multi-del',
     data: {
       ids
     }
@@ -138,7 +136,7 @@ async function plantImageMultiDelete() {
 async function plantImageQuery(plantId: number): Promise<ImageFormState[]> {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant-image/page',
+    url: '/plant-image/page',
     data: {
       plantId,
       pageSize: 100,
@@ -158,7 +156,7 @@ const detailGet = async () => {
     const list = await plantImageQuery(res.id)
     imageList.value = list.map(item => ({
       ...item,
-      url: `${backendUrl}${item.PictureSite}`,
+      url: `${import.meta.env.VITE_BACKEND_URL}${item.PictureSite}`,
       checked: false,
     }))
   }

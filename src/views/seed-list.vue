@@ -20,7 +20,7 @@ const router = useRouter()
 async function seedDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed/del',
+    url: '/seed/del',
     data: {
       id
     }
@@ -42,7 +42,7 @@ async function seedMultiDelete() {
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed/multi-del',
+    url: '/seed/multi-del',
     data: {
       ids
     }
@@ -58,7 +58,7 @@ async function seedMultiDelete() {
 const seedQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed/page',
+    url: '/seed/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,

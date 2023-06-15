@@ -8,8 +8,6 @@ import {
   PlusOutlined
 } from '@ant-design/icons-vue';
 
-const backendUrl = 'http://localhost:6166'
-
 interface DataSourceItem {
   id: number;
   PictureName: string;
@@ -26,7 +24,7 @@ const router = useRouter()
 async function seedGalleryAdd() {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/add',
+    url: '/seed-gallery/add',
     data: {
       item: {
         ...formState
@@ -40,7 +38,7 @@ async function seedGalleryAdd() {
 async function seedGalleryDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/del',
+    url: '/seed-gallery/del',
     data: {
       id
     }
@@ -52,7 +50,7 @@ async function seedGalleryDelete(id: number, index: number) {
 const seedGalleryQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/page',
+    url: '/seed-gallery/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,
@@ -77,7 +75,7 @@ const seedGalleryQuery = async () => {
 async function getCoverPicture<T extends { url?: string, PictureAddress?: string }>(PictureSetID: number): Promise<T> {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/page',
+    url: '/seed-image/page',
     data: {
       PictureSetID,
       pageSize: 1,
@@ -85,7 +83,7 @@ async function getCoverPicture<T extends { url?: string, PictureAddress?: string
   })
   console.log('getCoverPicture', res.data?.data)
   const coverPicture: T = res.data?.data?.list?.[0] || {}
-  coverPicture.url = coverPicture.PictureAddress ? `${backendUrl}${coverPicture.PictureAddress}` : ''
+  coverPicture.url = coverPicture.PictureAddress ? `${import.meta.env.VITE_BACKEND_URL}${coverPicture.PictureAddress}` : ''
   return coverPicture
 }
 
@@ -172,28 +170,28 @@ onBeforeMount(async () => {
       </a-col>
     </a-row>
     <a-modal v-model:visible="isAdd" title="新增图集" @ok="handleAdd" @cancel="cancelAdd">
-        <a-form
-          ref="formRef"
-          name="gallery"
-          :model="formState"
-          :label-col="{ span: 6 }"
-          :wrapper-col="{ span: 18 }"
+      <a-form
+        ref="formRef"
+        name="gallery"
+        :model="formState"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 18 }"
+      >
+        <a-form-item
+          name="PictureName"
+          label="图集名称"
+          :rules="[{ required: true, message: '请输入图集名称!' }]"
         >
-          <a-form-item
-            name="PictureName"
-            label="图集名称"
-            :rules="[{ required: true, message: '请输入图集名称!' }]"
-          >
-            <a-input v-model:value="formState.PictureName" placeholder=""></a-input>
-          </a-form-item>
-          <a-form-item
-            name="PictureDescription"
-            label="图集描述"
-          >
-            <a-textarea v-model:value="formState.PictureDescription" placeholder=""></a-textarea>
-          </a-form-item>
-        </a-form>
-      </a-modal>
+          <a-input v-model:value="formState.PictureName" placeholder=""></a-input>
+        </a-form-item>
+        <a-form-item
+          name="PictureDescription"
+          label="图集描述"
+        >
+          <a-textarea v-model:value="formState.PictureDescription" placeholder=""></a-textarea>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 

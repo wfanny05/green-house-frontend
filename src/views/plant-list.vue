@@ -24,7 +24,7 @@ const router = useRouter()
 async function plantDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant/del',
+    url: '/plant/del',
     data: {
       id
     }
@@ -46,7 +46,7 @@ async function plantMultiDelete() {
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant/multi-del',
+    url: '/plant/multi-del',
     data: {
       ids
     }
@@ -62,7 +62,7 @@ async function plantMultiDelete() {
 const plantQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/plant/page',
+    url: '/plant/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,

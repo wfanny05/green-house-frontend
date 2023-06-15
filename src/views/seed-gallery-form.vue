@@ -12,8 +12,6 @@ import {
 const router = useRouter()
 const route = useRoute()
 
-const backendUrl = 'http://localhost:6166'
-
 interface FormState { 
   PictureName: string
   PictureDescription: string
@@ -30,12 +28,12 @@ interface ImageFormState {
   [key: string]: any
 }
 
-// http://localhost:6166/static/img/16866789713804046.jpg
+// /static/img/16866789713804046.jpg
 
 async function seedGet() : Promise<FormState>{
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/get',
+    url: '/seed-gallery/get',
     data: {
       id: seedGalleryId.value
     }
@@ -55,7 +53,7 @@ async function seedUpdate() {
   }
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/update',
+    url: '/seed-gallery/update',
     data: {
       id: seedGalleryId.value,
       item,
@@ -78,7 +76,7 @@ async function seedImageAdd(): Promise<ImageFormState> {
   formData.append('PictureSetID', seedGalleryId.value)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/add',
+    url: '/seed-image/add',
     headers: { 'Content-Type': 'multipart/form-data' },
     data: formData,
   })
@@ -98,7 +96,7 @@ async function seedImageUpdate(): Promise<ImageFormState> {
   formData.append('PictureSetID', seedGalleryId.value)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/update',
+    url: '/seed-image/update',
     headers: { 'Content-Type': 'multipart/form-data' },
     data: formData,
   })
@@ -115,7 +113,7 @@ async function seedImageMultiDelete() {
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/multi-del',
+    url: '/seed-image/multi-del',
     data: {
       ids
     }
@@ -131,7 +129,7 @@ async function seedImageMultiDelete() {
 async function seedImageQuery(PictureSetID: number): Promise<ImageFormState[]> {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/page',
+    url: '/seed-image/page',
     data: {
       PictureSetID,
       pageSize: 100,
@@ -151,7 +149,7 @@ const detailGet = async () => {
     const list = await seedImageQuery(res.id)
     imageList.value = list.map(item => ({
       ...item,
-      url: `${backendUrl}${item.PictureAddress}`,
+      url: `${import.meta.env.VITE_BACKEND_URL}${item.PictureAddress}`,
       checked: false,
     }))
   }

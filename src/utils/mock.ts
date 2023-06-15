@@ -14,7 +14,7 @@ export const mockFuncs : { [key :string] : Function } = {
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: 'http://localhost:6166/green-house/add',
+      url: '/green-house/add',
       data: {
         item
       }
@@ -34,7 +34,7 @@ export const mockFuncs : { [key :string] : Function } = {
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: 'http://localhost:6166/env-info/add',
+      url: '/env-info/add',
       data: {
         item
       }
@@ -53,7 +53,7 @@ export const mockFuncs : { [key :string] : Function } = {
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: 'http://localhost:6166/seed/add',
+      url: '/seed/add',
       data: {
         item
       }
@@ -67,7 +67,7 @@ export const mockFuncs : { [key :string] : Function } = {
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: 'http://localhost:6166/seed-gallery/add',
+      url: '/seed-gallery/add',
       data: {
         item
       }
@@ -88,7 +88,27 @@ export const mockFuncs : { [key :string] : Function } = {
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: 'http://localhost:6166/plant/add',
+      url: '/plant/add',
+      data: {
+        item
+      }
+    })
+  },
+  sensor: async () => {
+    const item = {
+      SensorCode: Mock.Random.string('string', 6), 
+      SensorName: Mock.Random.ctitle(6),
+      GreenhouseCode: 54, // 大棚id
+      SensorType: '1', // 1 光照度传感器；2 二氧化碳传感器；3 空气温度传感器； 4 土壤温度传感器；5 空气湿度传感器；6 土壤湿度传感器
+      Volume: Mock.Random.integer(0, 50), // 测量值
+      FloorVolume: Mock.Random.integer(0, 50), // 上限值
+      CeilingVolume: Mock.Random.integer(0, 50), // 下限值
+      Note: Mock.Random.csentence(10, 20),
+    }
+    // console.log(11, item)
+    const res = await axiosInstance({
+      method: 'post',
+      url: '/sensor/add',
       data: {
         item
       }

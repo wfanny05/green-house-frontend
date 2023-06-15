@@ -23,7 +23,7 @@ const router = useRouter()
 const envInfoQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/env-info/page',
+    url: '/env-info/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,

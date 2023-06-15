@@ -20,7 +20,7 @@ const router = useRouter()
 async function greenHouseDelete(id: number, index: number) {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/del',
+    url: '/green-house/del',
     data: {
       id
     }
@@ -42,7 +42,7 @@ async function greenHouseMultiDelete() {
   // console.log(111, ids)
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/multi-del',
+    url: '/green-house/multi-del',
     data: {
       ids
     }
@@ -58,7 +58,7 @@ async function greenHouseMultiDelete() {
 const greenHouseQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/page',
+    url: '/green-house/page',
     data: {
       pageNo: pagination.current,
       pageSize: pagination.pageSize,

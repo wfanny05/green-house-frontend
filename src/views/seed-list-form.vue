@@ -5,7 +5,6 @@ import { useRouter, useRoute } from 'vue-router'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue';
 
-const backendUrl = 'http://localhost:6166'
 const router = useRouter()
 const route = useRoute()
 
@@ -46,7 +45,7 @@ interface FormState {
 async function seedGet() : Promise<FormState>{
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed/get',
+    url: '/seed/get',
     data: {
       id: seedId.value
     }
@@ -76,7 +75,7 @@ async function seedAddOrUpdate() {
   }
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed/add-or-update',
+    url: '/seed/add-or-update',
     data: {
       id: seedId.value,
       item,
@@ -91,7 +90,7 @@ async function seedAddOrUpdate() {
 const seedGalleryQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-gallery/page',
+    url: '/seed-gallery/page',
     data: {
       pageNo: 1,
       pageSize: 100,
@@ -107,7 +106,7 @@ async function getCoverPicture(PictureSetID: number): Promise<void> {
   if(!PictureSetID) return
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/seed-image/page',
+    url: '/seed-image/page',
     data: {
       PictureSetID,
       pageSize: 1,
@@ -115,7 +114,7 @@ async function getCoverPicture(PictureSetID: number): Promise<void> {
   })
   console.log('getCoverPicture', res.data?.data)
   coverPicture.value = res.data?.data?.list[0]
-  coverPicture.value.url = `${backendUrl}${coverPicture.value.PictureAddress}`
+  coverPicture.value.url = `${import.meta.env.VITE_BACKEND_URL}${coverPicture.value.PictureAddress}`
   // return coverPicture
   // return res.data?.data?.list || {}
 }

@@ -21,7 +21,7 @@ interface FormState {
 async function greenHouseGet() : Promise<FormState>{
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/get',
+    url: '/green-house/get',
     data: {
       id: route.query.id
     }
@@ -33,7 +33,7 @@ async function greenHouseGet() : Promise<FormState>{
 async function greenHouseAdd() {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/add',
+    url: '/green-house/add',
     data: {
       item: {
         ...formState
@@ -46,7 +46,7 @@ async function greenHouseAdd() {
 async function greenHouseUpdate() {
   const res = await axiosInstance({
     method: 'post',
-    url: 'http://localhost:6166/green-house/update',
+    url: '/green-house/update',
     data: {
       id: route.query.id,
       item: {
