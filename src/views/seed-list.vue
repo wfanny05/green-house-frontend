@@ -214,7 +214,7 @@ onBeforeMount(async () => {
 
     <a-alert :message="alertMsg" type="info" show-icon />
 
-    <a-button @click="dataFill(3, 'seed')">Add</a-button>
+    <!--<a-button @click="dataFill(3, 'seed')">Add</a-button>-->
 
     <a-table 
       :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"
@@ -227,7 +227,7 @@ onBeforeMount(async () => {
         <template v-if="column.dataIndex === 'operation'">
           <a @click.prevent="toFormPage(record.id)">查看详情</a>
           <a-divider type="vertical" />
-          <a @click.prevent="toFormPage(record.id, true)">编辑</a>
+          <!-- <a @click.prevent="toFormPage(record.id, true)">编辑</a> -->
         </template>
       </template>
   </a-table>

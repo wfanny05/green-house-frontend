@@ -227,7 +227,7 @@ onBeforeMount(async () => {
 
     <a-alert :message="alertMsg" type="info" show-icon />
 
-    <a-button @click="dataFill(3, 'greenHouse')">Add</a-button>
+    <!--<a-button @click="dataFill(3, 'greenHouse')">Add</a-button>-->
     <!-- <a-button @click="greenHouseDelete">Delete</a-button>
     <a-button @click="greenHouseUpdate">Update</a-button>
     <a-button @click="greenHouseQuery">Query</a-button> -->

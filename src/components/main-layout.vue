@@ -112,22 +112,22 @@ export default defineComponent({
             title: '作物列表',
             path: '/plant-list'
           },
-          {
-            title: '​​灌溉记录',
-            path: '/plant-irrigation'
-          },
-          {
-            title: '​​施肥记录',
-            path: '/plant-fertilize'
-          },
-          {
-            title: '​​农药记录',
-            path: '/plant-pesticide'
-          },
-          {
-            title: '​​病虫害记录',
-            path: '/plant-disease'
-          },
+          // {
+          //   title: '灌溉记录',
+          //   path: '/plant-irrigation'
+          // },
+          // {
+          //   title: '施肥记录',
+          //   path: '/plant-fertilize'
+          // },
+          // {
+          //   title: '农药记录',
+          //   path: '/plant-pesticide'
+          // },
+          // {
+          //   title: '病虫害记录',
+          //   path: '/plant-disease'
+          // },
         ]
       },
       {

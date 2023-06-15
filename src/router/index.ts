@@ -62,26 +62,26 @@ const router = createRouter({
       name: 'plant-list-form',
       component: () => import('../views/plant-list-form.vue')
     },
-    {
-      path: '/plant-irrigation',
-      name: 'plant-irrigation',
-      component: () => import('../views/plant-irrigation.vue')
-    },
-    {
-      path: '/plant-fertilize',
-      name: 'plant-fertilize',
-      component: () => import('../views/plant-fertilize.vue')
-    },
-    {
-      path: '/plant-pesticide',
-      name: 'plant-pesticide',
-      component: () => import('../views/plant-pesticide.vue')
-    },
-    {
-      path: '/plant-disease',
-      name: 'plant-disease',
-      component: () => import('../views/plant-disease.vue')
-    },
+    // {
+    //   path: '/plant-irrigation',
+    //   name: 'plant-irrigation',
+    //   component: () => import('../views/plant-irrigation.vue')
+    // },
+    // {
+    //   path: '/plant-fertilize',
+    //   name: 'plant-fertilize',
+    //   component: () => import('../views/plant-fertilize.vue')
+    // },
+    // {
+    //   path: '/plant-pesticide',
+    //   name: 'plant-pesticide',
+    //   component: () => import('../views/plant-pesticide.vue')
+    // },
+    // {
+    //   path: '/plant-disease',
+    //   name: 'plant-disease',
+    //   component: () => import('../views/plant-disease.vue')
+    // },
     {
       path: '/sensor-list',
       name: 'sensor-list',

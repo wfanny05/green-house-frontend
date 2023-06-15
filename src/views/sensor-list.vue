@@ -365,7 +365,7 @@ onBeforeMount(async () => {
 
     <a-alert :message="alertMsg" type="info" show-icon />
 
-    <a-button @click="dataFill(3, 'sensor')">Add</a-button>
+    <!--<a-button @click="dataFill(3, 'sensor')">Add</a-button>-->
 
     <a-table 
       :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"

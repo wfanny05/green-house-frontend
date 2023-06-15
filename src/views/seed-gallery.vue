@@ -2,7 +2,7 @@
 import { reactive, onBeforeMount, watch, ref, toRefs, computed } from 'vue'
 import axiosInstance from '../utils/axios-instance'
 import { dataFill } from '../utils/mock'
-import type { PaginationProps, FormInstance } from 'ant-design-vue'
+import type { FormInstance } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import {
   PlusOutlined
@@ -140,7 +140,7 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <a-button @click="dataFill(2, 'seedGallery')">Add</a-button>
+    <!--<a-button @click="dataFill(2, 'seedGallery')">Add</a-button>-->
     <a-row :gutter="24">
       <a-col :span="6">
         <div class="add-button" @click="add">
@@ -164,7 +164,7 @@ onBeforeMount(async () => {
           <template #actions>
             <div class="action-btn" @click="toFormPage(item.id)">查看图集</div>
             <div class="action-btn" @click="seedGalleryDelete(item.id, index)">删除图集</div>
-            <div class="action-btn">查看图片</div>
+            <!-- <div class="action-btn">查看图片</div> -->
           </template>
         </a-card>
       </a-col>

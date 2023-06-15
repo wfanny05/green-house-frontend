@@ -192,7 +192,7 @@ onBeforeMount(async () => {
         </a-row>
     </a-form>
 
-    <a-button @click="dataFill(1, 'envInfo')">Add</a-button>
+    <!--<a-button @click="dataFill(1, 'envInfo')">Add</a-button>-->
 
     <!-- :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }" -->
     <a-table 

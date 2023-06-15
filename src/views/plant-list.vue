@@ -277,7 +277,7 @@ onBeforeMount(async () => {
       <a-button @click="plantMultiDelete">批量删除</a-button>
     </div>
 
-    <a-button @click="dataFill(3, 'plant')">Add</a-button>
+    <!--<a-button @click="dataFill(3, 'plant')">Add</a-button>-->
 
     <a-table 
       :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"
