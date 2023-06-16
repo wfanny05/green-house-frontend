@@ -125,7 +125,7 @@ export const dataFill = (count: number, name: string) => {
 }
 
 export const mockEnvData = async (hourTotal: number = 24) => {
-  const start = dayjs('2023-05-07 02:00:00')
+  const start = dayjs('2023-05-08 02:00:00')
   for (let index = 0; index < hourTotal; index++) {
     const RecordDate = start.add(index+1, 'hour').format('YYYY-MM-DD HH:mm:ss') 
     console.log('RecordDate', RecordDate)

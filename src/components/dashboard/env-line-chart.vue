@@ -1,7 +1,11 @@
 
 <template>
-  <div id="main">
-  </div>
+  <a-row :gutter="24">
+    <a-col v-for="item in charts" :key="item.name" :span="12">
+      <div :id="item.name" class="chart-container">
+      </div>
+    </a-col>
+  </a-row>
 </template>
 
 <script lang="ts">
@@ -14,12 +18,18 @@ import {
   AppstoreOutlined,
   ArrowLeftOutlined
 } from '@ant-design/icons-vue';
-import { defineComponent, ref, onMounted, watch, provide } from 'vue';
+import { defineComponent, ref, onMounted, watch, watchEffect, provide, computed } from 'vue';
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 
 import * as echarts from 'echarts';
 
 type EChartsOption = echarts.EChartsOption;
+
+interface chartItem {
+      name: string
+      title: string
+      dataOption: { [key:string]: any }
+    }
 
 export default defineComponent({
   components: {
@@ -34,61 +44,102 @@ export default defineComponent({
   props: {
     title: String,
     likes: Number,
-    airTempList: Array,
-    airHumidityList: Array,
-    soilTempList: Array,
-    soilHumidityList: Array,
-    carbonDioxideLevelList: Array,
-    illuminanceList: Array,
+    airTempOption: Object,
+    airHumidityOption: Object,
+    soilTempOption: Object,
+    soilHumidityOption: Object,
+    carbonDioxideLevelOption: Object,
+    illuminanceOption: Object,
   },
   setup(props) {
     console.log('props', props)
-    let airTempList = props.airTempList?.values || [] 
+    const airTempOption = computed(() => props.airTempOption)
+    const airHumidityOption = computed(() => props.airHumidityOption || [] as number[])
+    const soilTempOption = computed(() => props.soilTempOption || [] as number[])
+    const soilHumidityOption = computed(() => props.soilHumidityOption || [] as number[])
+    const carbonDioxideLevelOption = computed(() => props.carbonDioxideLevelOption || [] as number[])
+    const illuminanceOption = computed(() => props.illuminanceOption || [] as number[])
+
     const router = useRouter()
     const route = useRoute()
 
-    const creatChart = () => {
-      var chartDom = document.getElementById('main')!;
-      console.log(chartDom)
-      var myChart = echarts.init(chartDom);
+    const charts: chartItem[] = [
+      {
+        name: 'airTemp',
+        title: '空气温度',
+        dataOption: airTempOption.value
+      }, 
+      {
+        name: 'airHumidity',
+        title: '空气湿度',
+        dataOption: airHumidityOption.value
+      }, 
+      {
+        name: 'soilTemp',
+        title: '土壤温度',
+        dataOption: soilTempOption.value
+      },
+      {
+        name: 'soilHumidity',
+        title: '土壤湿度',
+        dataOption: soilHumidityOption.value
+      },
+      {
+        name: 'illuminance',
+        title: '光照度',
+        dataOption: illuminanceOption.value
+      },
+      {
+        name: 'carbonDioxideLevel',
+        title: '二氧化碳浓度',
+        dataOption: carbonDioxideLevelOption.value
+      }
+    ]
+
+    let chartInstance = {}
+    const creatChart = (item: chartItem) => {
+      const { name, title, dataOption } = item
+      var chartDom = document.getElementById(name)!;
+      chartInstance[name] = chartInstance[name] || echarts.init(chartDom);
       var option: EChartsOption;
+      // console.log('dataOption', dataOption)
 
       option = {
         title: {
-          text: 'Temperature Change in the Coming Week'
+          text: title
         },
         tooltip: {
           trigger: 'axis'
         },
-        legend: {},
+        // legend: {},
         toolbox: {
           show: true,
           feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            dataView: { readOnly: false },
-            magicType: { type: ['line', 'bar'] },
-            restore: {},
+            // dataZoom: {
+            //   yAxisIndex: 'none'
+            // },
+            // dataView: { readOnly: false },
+            // magicType: { type: ['line', 'bar'] },
+            // restore: {},
             saveAsImage: {}
           }
         },
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          data: dataOption.xAxisData,
         },
         yAxis: {
           type: 'value',
           axisLabel: {
-            formatter: '{value} °C'
+            formatter: `{value} ${dataOption.unit}`
           }
         },
         series: [
           {
             name: '空气温度',
             type: 'line',
-            data: [],
+            data: dataOption.seriesData,
             markPoint: {
               data: [
                 { type: 'max', name: 'Max' },
@@ -99,69 +150,41 @@ export default defineComponent({
               data: [{ type: 'average', name: 'Avg' }]
             }
           },
-          {
-            name: 'Highest',
-            type: 'line',
-            data: [10, 11, 13, 11, 12, 12, 9],
-            markPoint: {
-              data: [
-                { type: 'max', name: 'Max' },
-                { type: 'min', name: 'Min' }
-              ]
-            },
-            markLine: {
-              data: [{ type: 'average', name: 'Avg' }]
-            }
-          },
-          // {
-          //   name: 'Lowest',
-          //   type: 'line',
-          //   data: [1, -2, 2, 5, 3, 2, 0],
-          //   markPoint: {
-          //     data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
-          //   },
-          //   markLine: {
-          //     data: [
-          //       { type: 'average', name: 'Avg' },
-          //       [
-          //         {
-          //           symbol: 'none',
-          //           x: '90%',
-          //           yAxis: 'max'
-          //         },
-          //         {
-          //           symbol: 'circle',
-          //           label: {
-          //             position: 'start',
-          //             formatter: 'Max'
-          //           },
-          //           type: 'max',
-          //           name: '最高点'
-          //         }
-          //       ]
-          //     ]
-          //   }
-          // }
         ]
       };
 
-      option && myChart.setOption(option);
+      option && chartInstance[name].setOption(option);
     }
 
     onMounted(() => {
-      creatChart()
+    })
+
+    // watch(airTempList, () => {
+    //   creatChart()
+    // }, {
+    //   flush: 'post'
+    // })
+
+    watchEffect(() => {
+      for (let index = 0; index < charts.length; index++) {
+        const item = charts[index];
+        creatChart(item)
+      }
+    }, {
+      flush: 'post'
     })
 
     return {
+      charts
     };
   },
 });
 </script>
 
 <style scoped>
-#main {
+.chart-container {
   width: 100%;
-  min-width: 1200px;
-  height: 600px;
+  min-width: 600px;
+  height: 400px;
 }
 </style>
