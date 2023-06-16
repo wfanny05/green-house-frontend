@@ -45,7 +45,7 @@ const envInfoQuery = async () => {
 const formRef = ref<FormInstance>();
 const formState = reactive({
   greenHouseCode: '',
-  greenhouseName: '',
+  greenHouseName: '',
   RecordDate: []
 });
 const onFinish = (values: any) => {
@@ -64,13 +64,13 @@ let dataSource = ref<DataSourceItem[]>([])
 const columns = [
   {
     title: '大棚编号',
-    dataIndex: 'GreenhouseCode',
-    key: 'GreenhouseCode',
+    dataIndex: 'greenHouseCode',
+    key: 'greenHouseCode',
   },
   {
     title: '大棚名称',
-    dataIndex: 'GreenhouseName',
-    key: 'GreenhouseName',
+    dataIndex: 'greenHouseName',
+    key: 'greenHouseName',
   },
   {
     title: '记录时间',
@@ -169,10 +169,10 @@ onBeforeMount(async () => {
         </a-col>
         <a-col :span="8">
           <a-form-item
-            name="greenhouseName"
+            name="greenHouseName"
             label="大棚名称"
           >
-            <a-input v-model:value="formState.greenhouseName" placeholder=""></a-input>
+            <a-input v-model:value="formState.greenHouseName" placeholder=""></a-input>
           </a-form-item>
         </a-col>
       </a-row>

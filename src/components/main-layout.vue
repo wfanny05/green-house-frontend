@@ -30,9 +30,10 @@
         <h1><span v-if="backUrl" class="back" @click="back"><arrow-left-outlined />返回</span> {{ pageTitle[pageTitle.length - 1] }}</h1>
       </div>
       <a-layout-content class="main-layout-content">
-        <div class="main-layout-content-inner">
+        <div v-if="currentPath !== '/dashboard-main'" class="main-layout-content-inner">
           <Suspense><slot></slot></Suspense>
         </div>
+        <Suspense v-else><slot></slot></Suspense>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -72,6 +73,16 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
     const menu: menuItem[] = [
+      {
+        title: 'Dashboard',
+        icon: 'AppstoreOutlined',
+        children: [
+          {
+            title: '分析页',
+            path: '/dashboard-main'
+          },
+        ]
+      },
       {
         title: '大棚管理',
         icon: 'AppstoreOutlined',
@@ -162,9 +173,11 @@ export default defineComponent({
       backUrl.value = url
     })
 
+    let currentPath = ref(route.path)
     watch(() => route.path, (newValue, oldValue) => {
       console.log(newValue, '新的路由')
       console.log(oldValue, '旧的路由')
+      currentPath.value = newValue
       const path = newValue
       pageTitle.value = []
       backUrl.value = ''
@@ -193,7 +206,8 @@ export default defineComponent({
       menu,
       pageTitle,
       back,
-      backUrl
+      backUrl,
+      currentPath
     };
   },
 });

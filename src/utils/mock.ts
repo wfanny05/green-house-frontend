@@ -1,5 +1,6 @@
 import Mock from 'mockjs'
 import axiosInstance from './axios-instance'
+import * as dayjs from 'dayjs'
 
 export const mockFuncs : { [key :string] : Function } = {
   greenHouse: async () => {
@@ -20,16 +21,17 @@ export const mockFuncs : { [key :string] : Function } = {
       }
     })
   },
-  envInfo: async () => {
+  envInfo: async (params: object = {}) => {
     const item = {
-      GreenhouseCode: 51,
+      GreenhouseCode: 54,
       RecordDate: Mock.Random.datetime('yyyy-MM-dd HH:mm:ss'),
-      AirTemp: Mock.Random.integer(0, 40),
-      AirHumidity: Mock.Random.integer(0, 100),
-      SoilTemp: Mock.Random.integer(0, 40),
-      SoilHumidity: Mock.Random.integer(0, 100),
-      CarbonDioxideLevel: Mock.Random.integer(500, 800),
-      Illuminance: Mock.Random.integer(100, 2000),
+      AirTemp: Mock.Random.integer(10, 30),
+      AirHumidity: Mock.Random.integer(50, 70),
+      SoilTemp: Mock.Random.integer(10, 30),
+      SoilHumidity: Mock.Random.integer(50, 70),
+      CarbonDioxideLevel: Mock.Random.integer(600, 800),
+      Illuminance: Mock.Random.integer(20000, 40000),
+      ...params
     }
     // console.log(11, item)
     const res = await axiosInstance({
@@ -119,5 +121,16 @@ export const mockFuncs : { [key :string] : Function } = {
 export const dataFill = (count: number, name: string) => {
   for (let index = 0; index < count; index++) {
     mockFuncs[name]()
+  }
+}
+
+export const mockEnvData = async (hourTotal: number = 24) => {
+  const start = dayjs('2023-05-07 02:00:00')
+  for (let index = 0; index < hourTotal; index++) {
+    const RecordDate = start.add(index+1, 'hour').format('YYYY-MM-DD HH:mm:ss') 
+    console.log('RecordDate', RecordDate)
+    await mockFuncs.envInfo({
+      RecordDate
+    })
   }
 }
