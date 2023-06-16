@@ -112,6 +112,7 @@ const pagination: {
   current: number;
   pageSize: number;
   total: number;
+  showLessItems?: boolean;
   showSizeChanger?: boolean;
   showQuickJumper?: boolean;
   showTotal?: (total: number) => string;
@@ -119,7 +120,8 @@ const pagination: {
   current: 1,
   pageSize: 10,
   total: 0,
-  // showSizeChanger: true,
+  showLessItems: true,
+  showSizeChanger: true,
   showQuickJumper: true,
   // showTotal: (total: number) => `共 ${total} 条`,
 })
@@ -141,6 +143,7 @@ const onSelectChange = (selectedRowKeys: number[]) => {
 const tableChange = async (_pagination: PaginationProps) => {
   console.log('tableChange', _pagination);
   pagination.current = _pagination.current as number
+  pagination.pageSize = _pagination.pageSize as number
   await envInfoQuery()
 }
 

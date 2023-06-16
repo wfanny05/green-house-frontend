@@ -2,6 +2,7 @@
 import { reactive, onBeforeMount, watch, watchEffect, ref, toRefs, computed } from 'vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue';
 import envLineChart from '../components/dashboard/env-line-chart.vue'
+import greenHouseMap from '../components/dashboard/green-house-map.vue'
 import axiosInstance from '@/utils/axios-instance';
 import { mockEnvData } from '../utils/mock'
 
@@ -164,33 +165,49 @@ const getPopupContainer = (triggerNode) => {
 <template>
   <div class="dashboard">
     <a-button @click="mockEnvData(7 * 24)">Mock 环境数据</a-button>
-    <div class="container">
-      <div class="container-header">
-        <div class="container-title">大棚当前信息</div>
-      </div>
-      <div class="container-content">
-        <a-row>
-          <a-col :span="12">
-            <a-statistic title="空气温度" :value="currentEnv.airTemp" style="margin-right: 50px" />
-          </a-col>
-          <a-col :span="12">
-            <a-statistic title="空气湿度" :value="currentEnv.airHumidity" />
-          </a-col>
-          <a-col :span="12">
-            <a-statistic title="土壤温度" :value="currentEnv.soilTemp" />
-          </a-col>
-          <a-col :span="12">
-            <a-statistic title="土壤湿度" :value="currentEnv.soilHumidity" />
-          </a-col>
-          <a-col :span="12">
-            <a-statistic title="光照度" :value="currentEnv.illuminance" />
-          </a-col>
-          <a-col :span="12">
-            <a-statistic title="二氧化碳浓度" :value="currentEnv.carbonDioxideLevel" />
-          </a-col>
-        </a-row>
-      </div>
-    </div>
+    
+    <a-row :gutter="24">
+      <a-col :span="12">
+        <div class="container">
+          <div class="container-header">
+            <div class="container-title">大棚当前环境信息</div>
+          </div>
+          <div class="container-content">
+            <a-row>
+              <a-col :span="12">
+                <a-statistic title="空气温度" :value="currentEnv.airTemp" style="margin-right: 50px" />
+              </a-col>
+              <a-col :span="12">
+                <a-statistic title="空气湿度" :value="currentEnv.airHumidity" />
+              </a-col>
+              <a-col :span="12">
+                <a-statistic title="土壤温度" :value="currentEnv.soilTemp" />
+              </a-col>
+              <a-col :span="12">
+                <a-statistic title="土壤湿度" :value="currentEnv.soilHumidity" />
+              </a-col>
+              <a-col :span="12">
+                <a-statistic title="光照度" :value="currentEnv.illuminance" />
+              </a-col>
+              <a-col :span="12">
+                <a-statistic title="二氧化碳浓度" :value="currentEnv.carbonDioxideLevel" />
+              </a-col>
+            </a-row>
+          </div>
+        </div>
+      </a-col>
+      <a-col :span="12">
+        <div class="container">
+          <!-- <div class="container-header">
+            <div class="container-title">大棚地区分布</div>
+          </div> -->
+          <div class="container-content">
+            <greenHouseMap />
+          </div>
+        </div>
+      </a-col>
+    </a-row>
+    
     <div class="container">
       <div class="container-header">
         <div class="container-title">大棚环境监测</div>

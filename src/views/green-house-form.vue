@@ -4,6 +4,7 @@ import axiosInstance from '../utils/axios-instance'
 import { useRouter, useRoute } from 'vue-router'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue';
+import geoJson from '@/assets/geo-shanghai.json'
 
 const router = useRouter()
 const route = useRoute()
@@ -56,6 +57,12 @@ async function greenHouseUpdate() {
   })
   console.log('greenHouseUpdate', res)
 }
+
+const areaList = geoJson.features.map((item: any) => {
+  return {
+    name: item.properties.name,
+  }
+})
 
 
 const formRef = ref<FormInstance>();
@@ -150,9 +157,16 @@ onBeforeMount(async () => {
       </a-form-item>
       <a-form-item
         name="Region"
-        label="大棚地址"
+        label="大棚地区"
+        :rules="[{ required: true, message: '请选择大棚地区!' }]"
       >
-        <a-textarea v-model:value="formState.Region" />
+        <a-select
+          ref="select"
+          v-model:value="formState.Region"
+          style="width: 200px"
+        >
+          <a-select-option v-for="item in areaList" :key="item.name" :value="item.name">{{ item.name }}</a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item
         name="Note"
