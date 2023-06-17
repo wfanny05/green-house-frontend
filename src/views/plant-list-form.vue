@@ -113,6 +113,7 @@ async function plantImageUpdate(): Promise<ImageFormState> {
 
 async function plantImageMultiDelete() {
   const ids = imageList.value.filter(item => item.checked).map(item => item.id).join(',')
+  const imagePaths = imageList.value.filter(item => item.checked).map(item => item.PictureSite)
   if(!ids) {
     message.error('请选择要删除的图片');
     return
@@ -122,7 +123,8 @@ async function plantImageMultiDelete() {
     method: 'post',
     url: '/plant-image/multi-del',
     data: {
-      ids
+      ids,
+      imagePaths
     }
   })
   console.log('plantImageMultiDelete', res)

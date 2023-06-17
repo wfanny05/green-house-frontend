@@ -106,6 +106,7 @@ async function seedImageUpdate(): Promise<ImageFormState> {
 
 async function seedImageMultiDelete() {
   const ids = imageList.value.filter(item => item.checked).map(item => item.id).join(',')
+  const imagePaths = imageList.value.filter(item => item.checked).map(item => item.PictureAddress)
   if(!ids) {
     message.error('请选择要删除的图片');
     return
@@ -115,7 +116,8 @@ async function seedImageMultiDelete() {
     method: 'post',
     url: '/seed-image/multi-del',
     data: {
-      ids
+      ids,
+      imagePaths
     }
   })
   console.log('seedImageMultiDelete', res)

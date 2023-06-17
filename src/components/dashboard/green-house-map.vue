@@ -116,7 +116,7 @@ export default defineComponent({
 .chart-container {
   width: 100%;
   min-width: 600px;
-  height: 400px;
+  height: 800px;
 }
 </style>
 

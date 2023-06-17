@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, onBeforeMount, watch, watchEffect, ref, toRefs, computed } from 'vue'
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue';
+import { ArrowUpOutlined, ArrowDownOutlined, LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons-vue';
+import { Empty } from 'ant-design-vue';
 import envLineChart from '../components/dashboard/env-line-chart.vue'
 import greenHouseMap from '../components/dashboard/green-house-map.vue'
 import axiosInstance from '@/utils/axios-instance';
@@ -9,6 +10,7 @@ import { mockEnvData } from '../utils/mock'
 
 const greenHouseList = ref([])
 const greenHouseId = ref(54)
+const greenHouseId2 = ref(54)
 const greenHouseQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
@@ -22,10 +24,50 @@ const greenHouseQuery = async () => {
   console.log('greenHouseQuery', res.data)
   
   greenHouseList.value = res.data.data.list || []
-  // greenHouseList.value.length > 0 && (greenHouseId.value = greenHouseList.value[0].id)
+  // greenHouseList.value.length > 0 && (greenHouseId2.value = greenHouseList.value[0].id)
   return res.data
 }
 greenHouseQuery()
+
+let plantImage = ref([])
+const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
+const getPlantImage = async () => {
+  const res = await axiosInstance({
+    method: 'post',
+    url: '/plant/page',
+    data: {
+      pageNo: 1,
+      pageSize: 100,
+      greenHouseId: greenHouseId.value,
+      sample: true,
+    }
+  })
+  console.log('plantQuery', res.data.data.list)
+  const plants = res.data.data.list || []
+  plantImage.value = []
+  for (let index = 0; index < plants.length; index++) {
+    const item = plants[index];
+    const res = await axiosInstance({
+      method: 'post',
+      url: '/plant-image/page',
+      data: {
+        pageNo: 1,
+        pageSize: 4,
+        plantId: item.id
+      }
+    })
+    const list = (res.data.data.list || []).map(item => {
+      return {
+        ...item,
+        url: `${import.meta.env.VITE_BACKEND_URL}${item.PictureSite}`
+      }
+    })
+    plantImage.value = plantImage.value.concat(list)
+  }
+  console.log('plantImage', plantImage.value)
+  return res.data
+}
+getPlantImage()
 
 
 const selectedTime = ref(0)
@@ -61,6 +103,28 @@ let currentEnv = ref({
   illuminance: 0,
 })
 
+const getCurrentEnv = async () => {
+  const res = await axiosInstance({
+    method: 'post',
+    url: '/env-info/page',
+    data: {
+      pageNo: 1,
+      pageSize: 1,
+      greenHouseId: greenHouseId.value
+    }
+  })
+  const envData = res.data.data.list || []
+  const current = envData[0] || []
+  currentEnv.value.airTemp = current.AirTemp || 0
+  currentEnv.value.airHumidity = current.AirHumidity || 0
+  currentEnv.value.soilTemp = current.SoilTemp || 0
+  currentEnv.value.soilHumidity = current.SoilHumidity || 0
+  currentEnv.value.carbonDioxideLevel = current.CarbonDioxideLevel || 0
+  currentEnv.value.illuminance = current.Illuminance || 0
+
+  console.log('getCurrentEnv', res)
+}
+
 const envInfoQuery = async () => {
   const pageSize = timeList[selectedTime.value].hours
   const res = await axiosInstance({
@@ -69,7 +133,7 @@ const envInfoQuery = async () => {
     data: {
       pageNo: 1,
       pageSize,
-      greenHouseId: greenHouseId.value
+      greenHouseId2: greenHouseId2.value
     }
   })
 
@@ -118,15 +182,6 @@ const envInfoQuery = async () => {
     illuminance$.seriesData[index] = item.Illuminance
     illuminance$.unit = 'lux'
     illuminance$.xAxisData[index] = item.RecordDate
-
-    if (index == 0) {
-      currentEnv.value.airTemp = item.AirTemp
-      currentEnv.value.airHumidity = item.AirHumidity
-      currentEnv.value.soilTemp = item.SoilTemp
-      currentEnv.value.soilHumidity = item.SoilHumidity
-      currentEnv.value.carbonDioxideLevel = item.CarbonDioxideLevel
-      currentEnv.value.illuminance = item.Illuminance
-    }
   }
 
   keys.forEach(key => {
@@ -144,6 +199,14 @@ const envInfoQuery = async () => {
   soilHumidityOption.value.unit = soilHumidity$.unit
   carbonDioxideLevelOption.value.unit = carbonDioxideLevel$.unit
   illuminanceOption.value.unit = illuminance$.unit
+
+  const current = envData[0] || []
+  currentEnv.value.airTemp = current.AirTemp || 0
+  currentEnv.value.airHumidity = current.AirHumidity || 0
+  currentEnv.value.soilTemp = current.SoilTemp || 0
+  currentEnv.value.soilHumidity = current.SoilHumidity || 0
+  currentEnv.value.carbonDioxideLevel = current.CarbonDioxideLevel || 0
+  currentEnv.value.illuminance = current.Illuminance || 0
   
   console.log('envInfoQuery')
 
@@ -152,8 +215,25 @@ const envInfoQuery = async () => {
 
 envInfoQuery()
 
-watchEffect(() => {
-  envInfoQuery()
+watch(greenHouseId, (value, old, onCleanup) => {
+  let update = true;
+  onCleanup(() => {
+    update = false;
+  })
+  if(update) {
+    getCurrentEnv()
+    getPlantImage()
+  }
+})
+
+watchEffect((onCleanup) => {
+  let update = true;
+  onCleanup(() => {
+    update = false;
+  })
+  if(update) {
+    envInfoQuery()
+  }
 })
 
 const getPopupContainer = (triggerNode) => {
@@ -170,10 +250,20 @@ const getPopupContainer = (triggerNode) => {
       <a-col :span="12">
         <div class="container">
           <div class="container-header">
-            <div class="container-title">大棚当前环境信息</div>
+            <div class="container-title">大棚当前信息</div>
+            <div class="container-action">
+              <a-select
+                ref="select"
+                v-model:value="greenHouseId"
+                style="width: 200px"
+                :getPopupContainer="getPopupContainer"
+              >
+                <a-select-option v-for="item in greenHouseList" :key="item.id" :value="item.id">{{ item.greenhouseName }}</a-select-option>
+              </a-select>
+            </div>
           </div>
           <div class="container-content">
-            <a-row>
+            <a-row style="margin-bottom: 24px;">
               <a-col :span="12">
                 <a-statistic title="空气温度" :value="currentEnv.airTemp" style="margin-right: 50px" />
               </a-col>
@@ -193,6 +283,30 @@ const getPopupContainer = (triggerNode) => {
                 <a-statistic title="二氧化碳浓度" :value="currentEnv.carbonDioxideLevel" />
               </a-col>
             </a-row>
+            <div>
+              <!-- <h3></h3> -->
+              <a-empty v-if="plantImage.length === 0" class="plant-empty" :image="simpleImage" description="暂无作物"/>
+              <a-carousel v-else arrows>
+                <template #prevArrow>
+                  <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                    <left-circle-outlined />
+                  </div>
+                </template>
+                <template #nextArrow>
+                  <div class="custom-slick-arrow" style="right: 10px">
+                    <right-circle-outlined />
+                  </div>
+                </template>
+                <div v-for="item in plantImage" :key="item.id">
+                  <div class="plant-image">
+                    <img 
+                      :src="item.url" 
+                    />
+                    <div class="plant-image-desc">{{ item.Description }}</div>
+                  </div>
+                </div>
+              </a-carousel>
+            </div>
           </div>
         </div>
       </a-col>
@@ -217,7 +331,7 @@ const getPopupContainer = (triggerNode) => {
           </a-radio-group>
           <a-select
             ref="select"
-            v-model:value="greenHouseId"
+            v-model:value="greenHouseId2"
             style="width: 200px"
             :getPopupContainer="getPopupContainer"
           >
@@ -267,7 +381,55 @@ const getPopupContainer = (triggerNode) => {
 }
 .container-content {
   padding: 24px;
-  
+}
+.plant-image {
+  /* position: relative; */
+}
+.plant-image::v-deep > img{
+  width: 100%;
+  /* height: 100%; */
+}
+.plant-image-desc {
+  /* position: absolute;
+  bottom: 0; */
+  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  height: 60px;
+  padding: 8px 24px;
+  /* color: #fff; */
+}
+.plant-empty {
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-carousel :deep(.slick-slide) {
+  /* text-align: center; */
+  /* height: 160px; */
+  /* line-height: 160px; */
+  /* background: #364d79; */
+  /* overflow: hidden; */
+}
+.ant-carousel :deep(.slick-arrow.custom-slick-arrow) {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  color: #fff;
+  background-color: rgba(31, 45, 61, 0.11);
+  opacity: 0.8;
+  z-index: 1;
+}
+.ant-carousel :deep(.custom-slick-arrow:before) {
+  display: none;
+}
+.ant-carousel :deep(.custom-slick-arrow:hover) {
+  opacity: 0.5;
+}
+
+.ant-carousel :deep(.slick-slide h3) {
+  color: #333;
 }
 </style>
 
