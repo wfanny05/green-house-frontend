@@ -28,8 +28,8 @@ interface SensorFormState {
   greenHouseCode: number // 大棚id
   SensorType: string // 1 光照度传感器；2 二氧化碳传感器；3 空气温度传感器； 4 土壤温度传感器；5 空气湿度传感器；6 土壤湿度传感器
   Volume: number // 测量值
-  FloorVolume: number // 上限值
-  CeilingVolume: number // 下限值
+  FloorVolume: number // 下限值
+  CeilingVolume: number // 上限值
   Note: string // 备注
   [key: string]: any
 }
@@ -205,12 +205,12 @@ const columns = [
     key: 'Volume',
   },
   {
-    title: '上限值',
+    title: '下限值',
     dataIndex: 'FloorVolume',
     key: 'FloorVolume',
   },
   {
-    title: '下限值',
+    title: '上限值',
     dataIndex: 'CeilingVolume',
     key: 'CeilingVolume',
   },
@@ -265,8 +265,8 @@ const sensorInitData = {
   greenHouseCode: 0, // 大棚id
   SensorType: '', // 1 光照度传感器；2 二氧化碳传感器；3 空气温度传感器； 4 土壤温度传感器；5 空气湿度传感器；6 土壤湿度传感器
   Volume: 0, // 测量值
-  FloorVolume: 0, // 上限值
-  CeilingVolume: 0, // 下限值
+  FloorVolume: 0, // 下限值
+  CeilingVolume: 0, // 上限值
   Note: '', // 备注
 }
 let sensorFormState = reactive<SensorFormState>(sensorInitData);

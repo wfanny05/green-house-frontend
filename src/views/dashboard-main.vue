@@ -4,6 +4,7 @@ import { ArrowUpOutlined, ArrowDownOutlined, LeftCircleOutlined, RightCircleOutl
 import { Empty } from 'ant-design-vue';
 import envLineChart from '../components/dashboard/env-line-chart.vue'
 import greenHouseMap from '../components/dashboard/green-house-map.vue'
+import warnPanel from '../components/dashboard/warn-panel.vue'
 import axiosInstance from '@/utils/axios-instance';
 import { mockEnvData, seedWarn } from '../utils/mock'
 
@@ -27,7 +28,7 @@ const greenHouseQuery = async () => {
   // greenHouseList.value.length > 0 && (greenHouseId2.value = greenHouseList.value[0].id)
   return res.data
 }
-greenHouseQuery()
+// greenHouseQuery()
 
 let plantImage = ref([])
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
@@ -78,15 +79,15 @@ const timeList = [
     hours: 24
   },
   {
-    label: '最近一周',
+    label: '最近三天',
     value: 'week',
-    hours: 7*24
+    hours: 3*24
   },
-  {
-    label: '最近一月',
-    value: 'month',
-    hours: 30*24
-  },
+  // {
+  //   label: '最近一月',
+  //   value: 'month',
+  //   hours: 30*24
+  // },
 ]
 let airTempOption = ref<{[key: string]: any}>({})
 let airHumidityOption = ref<{[key: string]: any}>({})
@@ -213,7 +214,7 @@ const envInfoQuery = async () => {
   return res.data
 }
 
-envInfoQuery()
+// envInfoQuery()
 
 watch(greenHouseId, (value, old, onCleanup) => {
   let update = true;
@@ -221,8 +222,8 @@ watch(greenHouseId, (value, old, onCleanup) => {
     update = false;
   })
   if(update) {
-    getCurrentEnv()
-    getPlantImage()
+    // getCurrentEnv()
+    // getPlantImage()
   }
 })
 
@@ -232,7 +233,7 @@ watchEffect((onCleanup) => {
     update = false;
   })
   if(update) {
-    envInfoQuery()
+    // envInfoQuery()
   }
 })
 
@@ -244,12 +245,12 @@ const getPopupContainer = (triggerNode) => {
 
 <template>
   <div class="dashboard">
-    <a-button @click="mockEnvData(7 * 24)">Mock 环境数据</a-button>
-    <a-button @click="seedWarn(9, 30)">发送告警</a-button>  
+    <!-- <a-button @click="mockEnvData(7 * 24)">Mock 环境数据</a-button>
+    <a-button @click="seedWarn(15, 3000)">发送告警</a-button>   -->
     <!-- 9 8 7 6 5 4 -->
 
     <a-row :gutter="24">
-      <a-col :span="12">
+      <a-col :span="8">
         <div class="container">
           <div class="container-header">
             <div class="container-title">大棚当前信息</div>
@@ -265,24 +266,48 @@ const getPopupContainer = (triggerNode) => {
             </div>
           </div>
           <div class="container-content">
-            <a-row style="margin-bottom: 24px;">
-              <a-col :span="12">
-                <a-statistic title="空气温度" :value="currentEnv.airTemp" style="margin-right: 50px" />
+            <a-row style="margin-bottom: 24px; padding: 0 24px; " >
+              <a-col :span="12" style="margin-bottom: 24px;">
+                <a-statistic title="空气温度" :value="currentEnv.airTemp" style="margin-right: 50px" >
+                  <template #suffix>
+                    <span>°C</span>
+                  </template>
+                </a-statistic>
               </a-col>
-              <a-col :span="12">
-                <a-statistic title="空气湿度" :value="currentEnv.airHumidity" />
+              <a-col :span="12" style="margin-bottom: 24px;">
+                <a-statistic title="空气湿度" :value="currentEnv.airHumidity" >
+                  <template #suffix>
+                    <span>%</span>
+                  </template>
+                </a-statistic>
               </a-col>
-              <a-col :span="12">
-                <a-statistic title="土壤温度" :value="currentEnv.soilTemp" />
+              <a-col :span="12" style="margin-bottom: 24px;">
+                <a-statistic title="土壤温度" :value="currentEnv.soilTemp" >
+                  <template #suffix>
+                    <span>°C</span>
+                  </template>
+                </a-statistic>
               </a-col>
-              <a-col :span="12">
-                <a-statistic title="土壤湿度" :value="currentEnv.soilHumidity" />
+              <a-col :span="12" style="margin-bottom: 24px;">
+                <a-statistic title="土壤湿度" :value="currentEnv.soilHumidity" >
+                  <template #suffix>
+                    <span>%</span>
+                  </template>
+                </a-statistic>
               </a-col>
-              <a-col :span="12">
-                <a-statistic title="光照度" :value="currentEnv.illuminance" />
+              <a-col :span="12" style="margin-bottom: 24px;">
+                <a-statistic title="光照度" :value="currentEnv.illuminance" >
+                  <template #suffix>
+                    <span>lux</span>
+                  </template>
+                </a-statistic>
               </a-col>
-              <a-col :span="12">
-                <a-statistic title="二氧化碳浓度" :value="currentEnv.carbonDioxideLevel" />
+              <a-col :span="12" >
+                <a-statistic title="二氧化碳浓度" :value="currentEnv.carbonDioxideLevel" >
+                  <template #suffix>
+                    <span>ppm</span>
+                  </template>
+                </a-statistic>
               </a-col>
             </a-row>
             <div>
@@ -301,18 +326,28 @@ const getPopupContainer = (triggerNode) => {
                 </template>
                 <div v-for="item in plantImage" :key="item.id">
                   <div class="plant-image">
-                    <img 
+                    <a-image 
                       :src="item.url" 
                     />
-                    <div class="plant-image-desc">{{ item.Description }}</div>
                   </div>
+                  <div class="plant-image-desc">{{ item.Description }}</div>
                 </div>
               </a-carousel>
             </div>
           </div>
         </div>
       </a-col>
-      <a-col :span="12">
+      <a-col :span="8">
+        <div class="container">
+          <div class="container-header">
+            <div class="container-title">大棚设备监控</div>
+          </div>
+          <div class="container-content">
+            <warnPanel />
+          </div>
+        </div>
+      </a-col>
+      <a-col :span="8">
         <div class="container">
           <!-- <div class="container-header">
             <div class="container-title">大棚地区分布</div>
@@ -386,6 +421,11 @@ const getPopupContainer = (triggerNode) => {
 }
 .plant-image {
   /* position: relative; */
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 .plant-image::v-deep > img{
   width: 100%;
@@ -397,11 +437,11 @@ const getPopupContainer = (triggerNode) => {
   width: 100%;
   /* background-color: rgba(255, 255, 255, 0.5); */
   height: 60px;
-  padding: 8px 24px;
+  padding: 8px;
   /* color: #fff; */
 }
 .plant-empty {
-  min-height: 400px;
+  min-height: 320px;
   display: flex;
   justify-content: center;
   align-items: center;

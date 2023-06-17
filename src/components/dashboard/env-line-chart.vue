@@ -1,7 +1,7 @@
 
 <template>
   <a-row :gutter="24">
-    <a-col v-for="item in charts" :key="item.name" :span="12">
+    <a-col v-for="item in charts" :key="item.name" :span="8">
       <div :id="item.name" class="chart-container">
       </div>
     </a-col>
@@ -184,7 +184,7 @@ export default defineComponent({
 <style scoped>
 .chart-container {
   width: 100%;
-  min-width: 600px;
-  height: 400px;
+  min-width: 400px;
+  height: 300px;
 }
 </style>

@@ -115,8 +115,8 @@ export default defineComponent({
 <style scoped>
 .chart-container {
   width: 100%;
-  min-width: 600px;
-  height: 800px;
+  min-width: 400px;
+  height: 730px;
 }
 </style>
 
