@@ -8,6 +8,8 @@ import {
   UploadOutlined,
   FormOutlined
 } from '@ant-design/icons-vue';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 const router = useRouter()
 const route = useRoute()
@@ -37,7 +39,38 @@ interface ImageFormState {
   [key: string]: any
 }
 
-// /static/img/16866789713804046.jpg
+const seedList = ref([])
+const getAllSeed = async () => {
+  const res = await axiosInstance({
+    method: 'post',
+    url: '/seed/page',
+    data: {
+      pageNo: 1,
+      pageSize: 100,
+    }
+  })
+  seedList.value = res.data.data.list || []
+  console.log('getAllSeed', res.data)
+  return res.data
+}
+getAllSeed()
+
+const greenHouseList = ref([])
+const getAllGreenHouse = async () => {
+  const res = await axiosInstance({
+    method: 'post',
+    url: '/green-house/page',
+    data: {
+      pageNo: 1,
+      pageSize: 100,
+    }
+  })
+  greenHouseList.value = res.data.data.list || []
+  console.log('getAllGreenHouse', res.data)
+  return res.data
+}
+getAllGreenHouse()
+
 
 async function plantGet() : Promise<FormState>{
   const res = await axiosInstance({
@@ -53,23 +86,24 @@ async function plantGet() : Promise<FormState>{
 
 async function plantUpdate() {
   let item = {
-    ...formState
+    ...formState,
   }
-  let stages:any = {}
-  for (let i = 1; i <= 5; i++) {
-    delete item[`stage${i}`]
-    stages[`stage${i}`] = formState[`stage${i}`]
+  if(formState.PlantedDate) {
+    item.PlantedDate = formState.PlantedDate.format('YYYY-MM-DD')
   }
+  if(formState.HarvestDate) {
+    item.HarvestDate = formState.HarvestDate.format('YYYY-MM-DD')
+  }
+  // console.log(99999, item)
   const res = await axiosInstance({
     method: 'post',
     url: '/plant/update',
     data: {
       id: plantId.value,
       item,
-      ...stages
     }
   })
-  await plantGet()
+  await detailGet()
   isEdit.value = false
   console.log('plantUpdate', res)
 }
@@ -128,10 +162,6 @@ async function plantImageMultiDelete() {
     }
   })
   console.log('plantImageMultiDelete', res)
-  // if (dataSource.value.length === tableState.selectedRowKeys.length && pagination.current > 1) {
-  //   console.log(1234, pagination.current)
-  //   pagination.current--
-  // } 
   await detailGet()
 }
 
@@ -153,7 +183,7 @@ const detailGet = async () => {
     const res = await plantGet()
     Object.keys(formState).forEach((key: string) => {
       // console.log('key', key, res[key])
-      formState[key] = res[key]
+      formState[key] = ['PlantedDate', 'HarvestDate'].includes(key) ? dayjs(res[key]) : res[key]
     })
     const list = await plantImageQuery(res.id)
     imageList.value = list.map(item => ({
@@ -194,12 +224,6 @@ const onFinish = async (values: any) => {
   await plantUpdate()
   message.success('更新成功！');
 };
-
-const goBack = () => {
-  router.push({
-    path: '/plant',
-  })
-}
 
 const imageFormRef = ref<FormInstance>();
 const imageFormState = reactive<ImageFormState>({
@@ -294,21 +318,37 @@ onBeforeMount(async () => {
         </a-col>
         <a-col :span="8">
           <a-form-item
-            name="seedName"
+            name="seedId"
             label="种子名称"
             :rules="[{ required: isEdit, message: '请选择种子!' }]"
           >
-            <a-input v-if="isEdit" v-model:value="formState.seedId" placeholder=""></a-input>
+            <!-- <a-input v-if="isEdit" v-model:value="formState.seedId" placeholder=""></a-input> -->
+            <a-select
+              v-if="isEdit"
+              ref="seed-select"
+              v-model:value="formState.seedId"
+              style="width: 100%"
+            >
+              <a-select-option v-for="item in seedList" :key="item.id" :value="item.id">{{ item.PlantName }}</a-select-option>
+            </a-select>
             <div v-else>{{ formState.seedName }}</div>
           </a-form-item>
         </a-col>
         <a-col :span="8">
           <a-form-item
-            name="greenHouseName"
+            name="greenHouseId"
             label="大棚名称"
             :rules="[{ required: isEdit, message: '请选择大棚!' }]"
           >
-            <a-input v-if="isEdit" v-model:value="formState.greenHouseId" placeholder=""></a-input>
+            <!-- <a-input v-if="isEdit" v-model:value="formState.greenHouseId" placeholder=""></a-input> -->
+            <a-select
+              v-if="isEdit"
+              ref="seed-select"
+              v-model:value="formState.greenHouseId"
+              style="width: 100%"
+            >
+              <a-select-option v-for="item in greenHouseList" :key="item.id" :value="item.id">{{ item.greenhouseName }}</a-select-option>
+            </a-select>
             <div v-else>{{ formState.greenHouseName }}</div>
           </a-form-item>
         </a-col>
@@ -328,8 +368,9 @@ onBeforeMount(async () => {
             label="播种时间"
             :rules="[{ required: isEdit, message: '请选择播种时间!' }]"
           >
-            <a-input v-if="isEdit" v-model:value="formState.PlantedDate" placeholder=""></a-input>
-            <div v-else>{{ formState.PlantedDate }}</div>
+            <!-- <a-input v-if="isEdit" v-model:value="formState.PlantedDate" placeholder=""></a-input> -->
+            <a-date-picker v-if="isEdit" v-model:value="formState.PlantedDate" />
+            <div v-else>{{ formState.PlantedDate ? formState.PlantedDate.format('YYYY-MM-DD') : '' }}</div>
           </a-form-item>
         </a-col>
         <a-col :span="8" v-if="!isEdit">
@@ -353,8 +394,9 @@ onBeforeMount(async () => {
             name="HarvestDate"
             label="收获时间"
           >
-            <a-input v-if="isEdit" v-model:value="formState.HarvestDate" placeholder=""></a-input>
-            <div v-else>{{ formState.HarvestDate }}</div>
+            <!-- <a-input v-if="isEdit" v-model:value="formState.HarvestDate" placeholder=""></a-input> -->
+            <a-date-picker v-if="isEdit" v-model:value="formState.HarvestDate" />
+            <div v-else>{{ formState.HarvestDate ? formState.HarvestDate.format('YYYY-MM-DD') : '' }}</div>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -363,7 +405,7 @@ onBeforeMount(async () => {
             label="作物产量"
           >
             <a-input v-if="isEdit" v-model:value="formState.Output" placeholder=""></a-input>
-            <div v-else>{{ formState.Output }} KG</div>
+            <div v-else>{{ formState.Output ? `${formState.Output} KG` : '' }}</div>
           </a-form-item>
         </a-col>
       </a-row>
