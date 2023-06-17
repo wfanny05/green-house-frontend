@@ -20,11 +20,11 @@ interface FormState {
   seedId: number;
   greenHouseName: string;
   greenHouseId: number;
-  PlantedDate: string;
+  PlantedDate: string | Dayjs;
   Days: number;
   PlantStatus: string;
   PlantStatusName: string;
-  HarvestDate: string
+  HarvestDate: string | Dayjs;
   Output: number
   Area_m2: number
   [key: string]: any
@@ -34,6 +34,7 @@ interface ImageFormState {
   id?: number
   PictureName: string
   Description: string
+  PictureType: string
   PictureSite?: string
   fileList: any
   [key: string]: any
@@ -133,6 +134,7 @@ async function plantImageUpdate(): Promise<ImageFormState> {
   }
   formData.append('id', editImageId+'')
   formData.append('PictureName', imageFormState.PictureName)
+  formData.append('PictureType', imageFormState.PictureType)
   formData.append('Description', imageFormState.Description)
   formData.append('plantId', plantId.value)
   const res = await axiosInstance({
@@ -178,12 +180,23 @@ async function plantImageQuery(plantId: number): Promise<ImageFormState[]> {
   return res.data?.data?.list || {}
 }
 
+const PlantedDateText = ref('')
+const HarvestDateText = ref('')
 const detailGet = async () => {
   if(plantId.value) {
     const res = await plantGet()
     Object.keys(formState).forEach((key: string) => {
       // console.log('key', key, res[key])
-      formState[key] = ['PlantedDate', 'HarvestDate'].includes(key) ? dayjs(res[key]) : res[key]
+      // formState[key] = ['PlantedDate', 'HarvestDate'].includes(key) ? dayjs(res[key]) : res[key]
+      if(key === 'PlantedDate') {
+        PlantedDateText.value = res[key]
+        formState[key] = dayjs(res[key] || undefined)
+      } else if (key === 'HarvestDate') {
+        HarvestDateText.value = res[key]
+        formState[key] = formState[key] ? dayjs(res[key]) : ''
+      } else {
+        formState[key] = res[key]
+      }
     })
     const list = await plantImageQuery(res.id)
     imageList.value = list.map(item => ({
@@ -225,10 +238,28 @@ const onFinish = async (values: any) => {
   message.success('更新成功！');
 };
 
+const PlantStatusArr = [{
+  label: '萌发期',
+  value: '1'
+}, {
+  label: '幼苗期',
+  value: '2'
+}, {
+  label: '生长期',
+  value: '3'
+}, {
+  label: '开花期',
+  value: '4'
+}, {
+  label: '结果期',
+  value: '5'
+}]
+
 const imageFormRef = ref<FormInstance>();
 const imageFormState = reactive<ImageFormState>({
   PictureName: '',
   Description: '',
+  PictureType: '',
   fileList: [],
 });
 let isEditImage = ref(false)
@@ -370,7 +401,7 @@ onBeforeMount(async () => {
           >
             <!-- <a-input v-if="isEdit" v-model:value="formState.PlantedDate" placeholder=""></a-input> -->
             <a-date-picker v-if="isEdit" v-model:value="formState.PlantedDate" />
-            <div v-else>{{ formState.PlantedDate ? formState.PlantedDate.format('YYYY-MM-DD') : '' }}</div>
+            <div v-else>{{ PlantedDateText }}</div>
           </a-form-item>
         </a-col>
         <a-col :span="8" v-if="!isEdit">
@@ -396,7 +427,7 @@ onBeforeMount(async () => {
           >
             <!-- <a-input v-if="isEdit" v-model:value="formState.HarvestDate" placeholder=""></a-input> -->
             <a-date-picker v-if="isEdit" v-model:value="formState.HarvestDate" />
-            <div v-else>{{ formState.HarvestDate ? formState.HarvestDate.format('YYYY-MM-DD') : '' }}</div>
+            <div v-else>{{ HarvestDateText }}</div>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -460,6 +491,19 @@ onBeforeMount(async () => {
           label="图片描述"
         >
           <a-textarea v-model:value="imageFormState.Description" placeholder=""></a-textarea>
+        </a-form-item>
+        <a-form-item
+          name="PictureType"
+          label="图片类型"
+          :rules="[{ required: true, message: '请选择图片类型!' }]"
+        >
+          <a-select
+            ref="select"
+            v-model:value="imageFormState.PictureType"
+            style="width: 100%"
+          >
+            <a-select-option v-for="item in PlantStatusArr" :key="item.value" :value="item.value">{{ item.label }}</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item
           name="fileList"

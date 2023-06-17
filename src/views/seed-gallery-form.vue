@@ -183,6 +183,23 @@ const goBack = () => {
   })
 }
 
+const PlantStatusArr = [{
+  label: '萌发期',
+  value: '1'
+}, {
+  label: '幼苗期',
+  value: '2'
+}, {
+  label: '生长期',
+  value: '3'
+}, {
+  label: '开花期',
+  value: '4'
+}, {
+  label: '结果期',
+  value: '5'
+}]
+
 const imageFormRef = ref<FormInstance>();
 const imageFormState = reactive<ImageFormState>({
   PictureName: '',
@@ -337,6 +354,19 @@ onBeforeMount(async () => {
           :rules="[{ required: true, message: '请输入图片名称!' }]"
         >
           <a-input v-model:value="imageFormState.PictureName" placeholder=""></a-input>
+        </a-form-item>
+        <a-form-item
+          name="PictureType"
+          label="图片类型"
+          :rules="[{ required: true, message: '请选择图片类型!' }]"
+        >
+          <a-select
+            ref="select"
+            v-model:value="imageFormState.PictureType"
+            style="width: 100%"
+          >
+            <a-select-option v-for="item in PlantStatusArr" :key="item.value" :value="item.value">{{ item.label }}</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item
           name="PictureDescription"

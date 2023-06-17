@@ -68,7 +68,7 @@ const getPlantImage = async () => {
   console.log('plantImage', plantImage.value)
   return res.data
 }
-getPlantImage()
+// getPlantImage()
 
 
 const selectedTime = ref(0)
