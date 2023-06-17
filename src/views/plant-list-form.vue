@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons-vue';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import { compareImageSimilarity } from '@/utils/compare-image'
 
 const router = useRouter()
 const route = useRoute()
@@ -182,12 +183,13 @@ async function plantImageQuery(plantId: number): Promise<ImageFormState[]> {
 
 const PlantedDateText = ref('')
 const HarvestDateText = ref('')
+const PictureSetID = ref('')
 const detailGet = async () => {
   if(plantId.value) {
     const res = await plantGet()
+    PictureSetID.value = res.PictureSetID || ''
     Object.keys(formState).forEach((key: string) => {
       // console.log('key', key, res[key])
-      // formState[key] = ['PlantedDate', 'HarvestDate'].includes(key) ? dayjs(res[key]) : res[key]
       if(key === 'PlantedDate') {
         PlantedDateText.value = res[key]
         formState[key] = dayjs(res[key] || undefined)
@@ -312,6 +314,71 @@ const selectNone = () => {
     item.checked = false
   })
 }
+
+let seedImage:{[key: string]: string} = {}
+const getSeedImage = async (type: string) => {
+  const res = await axiosInstance({
+    method: 'post',
+    url: '/seed-image/page',
+    data: {
+      PictureSetID: PictureSetID.value,
+      PictureType: type,
+      pageSize: 100,
+    }
+  })
+  seedImage[type] = res.data?.data?.list || []
+} 
+
+const detectResultColumns = [
+  {
+    title: '标准图片',
+    dataIndex: 'seedImageName',
+    key: 'seedImageName',
+    // slots: { customRender: 'seedImage' },
+  },
+  {
+    title: '相似度',
+    dataIndex: 'similarity',
+    key: 'similarity',
+    // slots: { customRender: 'similarity' },
+  },
+]
+const detectLoading = ref(false)
+const detectResult = ref<any[]>([])
+const detect = async (data) => {
+  // console.log('detect', data, PictureSetID.value)
+  detectLoading.value = true
+  // const res = await compareImageSimilarity('/api/static/green-house/img/16869924643782152.jpg',
+  // '/api/static/green-house/img/16869924643782152.jpg')
+
+  if(!seedImage[data.PictureType]) {
+    await getSeedImage(data.PictureType)
+  }
+
+  if(seedImage[data.PictureType].length === 0) {
+    message.error('种子未设置该类型标准图片')
+    detectLoading.value = false
+    return
+  }
+
+  let result = []
+  for(let i = 0; i < seedImage[data.PictureType].length; i++) {
+    const item = seedImage[data.PictureType][i]
+    console.log('item', i, item)
+    let similarity = await compareImageSimilarity('/api'+item.PictureAddress, '/api'+data.PictureSite)
+    similarity = similarity * 100
+
+    result.push({
+      seedImageName: item.PictureName,
+      seedImageUrl: `${import.meta.env.VITE_BACKEND_URL}${item.PictureAddress}`,
+      similarity
+    })
+  }
+
+  detectResult.value = result
+  detectLoading.value = false
+}
+
 
 const pageTitlePush = inject('pageTitlePush') as (title: string, url: string) => void
 const title = plantId.value ? '作物详情' : '新增作物'
@@ -470,12 +537,35 @@ onBeforeMount(async () => {
             </div>
           </template>
           <a-card-meta title="">
-            <template #description><div>{{ item.Description }}</div></template>
+            <template #description>
+              <div>{{ item.Description }}</div>
+              <div><a-button @click="detect(item)" :loading="detectLoading">对比检测</a-button></div>
+            </template>
           </a-card-meta>
         </a-card>
       </a-col>
     </a-row>
-
+    <div class="detect-result" v-if="detectResult.length > 0">
+      <a-table 
+        :dataSource="detectResult"
+        :columns="detectResultColumns"
+        :pagination="false"
+      >
+        <template #title>
+          <a-alert message="对比检测结果" type="success" show-icon />
+        </template>
+        <template #bodyCell="{ column, text, record, index }">
+          <template v-if="column.dataIndex === 'seedImageName'">
+            <a-image :src="record.seedImageUrl" :width="100"></a-image>
+            <div>{{ record.seedImageName }}</div>
+          </template>
+          <template v-if="column.dataIndex === 'similarity'">
+            <a-tag v-if="record.similarity > 50" color="blue">{{ record.similarity.toFixed(2) }}%</a-tag>
+            <a-tag v-else color="red">{{ record.similarity.toFixed(2) }}%</a-tag>
+          </template>
+        </template>
+      </a-table>
+    </div>
     <a-modal v-model:visible="isEditImage" title="新增图片">
       <template #footer>
         <a-button key="back" @click="cancelAddImage">取 消</a-button>
@@ -590,6 +680,12 @@ onBeforeMount(async () => {
   flex: 1;
   display: flex;
   align-items: baseline;
+}
+
+.detect-result {
+  width: 800px;
+  border: 1px solid #eee;
+  margin-top: 24px;
 }
 </style>
 
