@@ -268,6 +268,7 @@ const addImage = () => {
   isEditImage.value = true
   editImageId = undefined
   imageFormState.PictureName = ''
+  imageFormState.PictureType = ''
   imageFormState.Description = ''
 }
 const cancelAddImage = () => {
@@ -293,6 +294,7 @@ const updateImage = (item: ImageFormState) => {
   isEditImage.value = true
   editImageId = item.id
   imageFormState.PictureName = item.PictureName
+  imageFormState.PictureType = item.PictureType
   imageFormState.Description = item.Description
 }
 let imageList = ref<ImageFormState[]>([])
@@ -468,7 +470,7 @@ onBeforeMount(async () => {
             </div>
           </template>
           <a-card-meta title="">
-            <template #description>{{ item.Description }}</template>
+            <template #description><div>{{ item.Description }}</div></template>
           </a-card-meta>
         </a-card>
       </a-col>
@@ -498,7 +500,7 @@ onBeforeMount(async () => {
           :rules="[{ required: true, message: '请选择图片类型!' }]"
         >
           <a-select
-            ref="select"
+            ref="image,select"
             v-model:value="imageFormState.PictureType"
             style="width: 100%"
           >
