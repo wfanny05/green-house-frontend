@@ -113,7 +113,7 @@ export default defineComponent({
       // showTotal: (total: number) => `共 ${total} 条`,
     })
     const sensorList = ref([])
-    // sensorQuery()
+    sensorQuery()
 
     const onChangePage = (page: number) => {
       // pagination.current = page

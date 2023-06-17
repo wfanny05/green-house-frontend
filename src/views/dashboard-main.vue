@@ -28,7 +28,7 @@ const greenHouseQuery = async () => {
   // greenHouseList.value.length > 0 && (greenHouseId2.value = greenHouseList.value[0].id)
   return res.data
 }
-// greenHouseQuery()
+greenHouseQuery()
 
 let plantImage = ref([])
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
@@ -68,8 +68,7 @@ const getPlantImage = async () => {
   console.log('plantImage', plantImage.value)
   return res.data
 }
-// getPlantImage()
-
+getPlantImage()
 
 const selectedTime = ref(0)
 const timeList = [
@@ -214,16 +213,14 @@ const envInfoQuery = async () => {
   return res.data
 }
 
-// envInfoQuery()
-
 watch(greenHouseId, (value, old, onCleanup) => {
   let update = true;
   onCleanup(() => {
     update = false;
   })
   if(update) {
-    // getCurrentEnv()
-    // getPlantImage()
+    getCurrentEnv()
+    getPlantImage()
   }
 })
 
@@ -233,7 +230,7 @@ watchEffect((onCleanup) => {
     update = false;
   })
   if(update) {
-    // envInfoQuery()
+    envInfoQuery()
   }
 })
 
