@@ -5,12 +5,12 @@ import { Empty } from 'ant-design-vue';
 import envLineChart from '../components/dashboard/env-line-chart.vue'
 import greenHouseMap from '../components/dashboard/green-house-map.vue'
 import axiosInstance from '@/utils/axios-instance';
-import { mockEnvData } from '../utils/mock'
+import { mockEnvData, seedWarn } from '../utils/mock'
 
 
 const greenHouseList = ref([])
-const greenHouseId = ref(54)
-const greenHouseId2 = ref(54)
+const greenHouseId = ref(57)
+const greenHouseId2 = ref(57)
 const greenHouseQuery = async () => {
   const res = await axiosInstance({
     method: 'post',
@@ -245,7 +245,9 @@ const getPopupContainer = (triggerNode) => {
 <template>
   <div class="dashboard">
     <a-button @click="mockEnvData(7 * 24)">Mock 环境数据</a-button>
-    
+    <a-button @click="seedWarn(9, 30)">发送告警</a-button>  
+    <!-- 9 8 7 6 5 4 -->
+
     <a-row :gutter="24">
       <a-col :span="12">
         <div class="container">
@@ -285,7 +287,7 @@ const getPopupContainer = (triggerNode) => {
             </a-row>
             <div>
               <!-- <h3></h3> -->
-              <a-empty v-if="plantImage.length === 0" class="plant-empty" :image="simpleImage" description="暂无作物"/>
+              <a-empty v-if="plantImage.length === 0" class="plant-empty" :image="simpleImage" description="暂无作物或未上传作物图片"/>
               <a-carousel v-else arrows>
                 <template #prevArrow>
                   <div class="custom-slick-arrow" style="left: 10px; z-index: 1">

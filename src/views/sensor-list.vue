@@ -459,12 +459,12 @@ onBeforeMount(async () => {
             </a-form-item>
           </a-col>
         </a-row>
-        <a-form-item
+        <!-- <a-form-item
           name="Note"
           label="备注"
         >
           <a-textarea v-model:value="sensorFormState.Note" placeholder=""></a-textarea>
-        </a-form-item>
+        </a-form-item> -->
       </a-form>
     </a-modal>
   </div>

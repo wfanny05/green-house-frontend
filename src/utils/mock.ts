@@ -96,24 +96,30 @@ export const mockFuncs : { [key :string] : Function } = {
       }
     })
   },
-  sensor: async () => {
-    const item = {
-      SensorCode: Mock.Random.string('string', 6), 
-      SensorName: Mock.Random.ctitle(6),
-      GreenhouseCode: 54, // 大棚id
-      SensorType: '1', // 1 光照度传感器；2 二氧化碳传感器；3 空气温度传感器； 4 土壤温度传感器；5 空气湿度传感器；6 土壤湿度传感器
-      Volume: Mock.Random.integer(0, 50), // 测量值
-      FloorVolume: Mock.Random.integer(0, 50), // 上限值
-      CeilingVolume: Mock.Random.integer(0, 50), // 下限值
-      Note: Mock.Random.csentence(10, 20),
+  sensor: async (action = 'add', _data = {}) => {  
+    const data = {}
+
+    if(_data.id) {
+      data.id = _data.id
+      data.item = _data.item
+    } else {
+      const item = {
+        SensorCode: Mock.Random.string('string', 6), 
+        SensorName: Mock.Random.ctitle(6),
+        GreenhouseCode: 54, // 大棚id
+        SensorType: '1', // 1 光照度传感器；2 二氧化碳传感器；3 空气温度传感器； 4 土壤温度传感器；5 空气湿度传感器；6 土壤湿度传感器
+        Volume: Mock.Random.integer(0, 50), // 测量值
+        FloorVolume: Mock.Random.integer(0, 50), // 上限值
+        CeilingVolume: Mock.Random.integer(0, 50), // 下限值
+        Note: Mock.Random.csentence(10, 20),
+      }
+      data.item = item
     }
     // console.log(11, item)
     const res = await axiosInstance({
       method: 'post',
-      url: '/sensor/add',
-      data: {
-        item
-      }
+      url: '/sensor/' + action,
+      data
     })
   },
 }
@@ -133,4 +139,14 @@ export const mockEnvData = async (hourTotal: number = 24) => {
       RecordDate
     })
   }
+}
+
+export const seedWarn = async (id, Volume) => {
+  mockFuncs.sensor('update', {
+    id,
+    item: {
+      Volume,
+      Warning: Mock.Random.csentence(10, 20),
+    }
+  })
 }
