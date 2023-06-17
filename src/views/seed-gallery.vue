@@ -159,7 +159,7 @@ onBeforeMount(async () => {
             </div>
           </template>
           <a-card-meta :title="item.PictureName">
-            <template #description>{{ item.PictureDescription }}---{{ item.cover }}</template>
+            <template #description>{{ item.PictureDescription }}</template>
           </a-card-meta>
           <template #actions>
             <div class="action-btn" @click="toFormPage(item.id)">查看图集</div>

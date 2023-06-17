@@ -144,6 +144,7 @@ async function seedImageQuery(PictureSetID: number): Promise<ImageFormState[]> {
 const detailGet = async () => {
   if(seedGalleryId.value) {
     const res = await seedGet()
+
     Object.keys(formState).forEach((key: string) => {
       // console.log('key', key, res[key])
       formState[key] = res[key]
@@ -152,6 +153,7 @@ const detailGet = async () => {
     imageList.value = list.map(item => ({
       ...item,
       url: `${import.meta.env.VITE_BACKEND_URL}${item.PictureAddress}`,
+      PictureTypeObj: PlantStatusArr[Number(item.PictureType) - 1],
       checked: false,
     }))
   }
@@ -168,6 +170,7 @@ const cancelEdit = () => {
 const formRef = ref<FormInstance>();
 const formState = reactive<FormState>({
   PictureName: '',
+  PictureType: '',
   PictureDescription: '',
 });
 const onFinish = async (values: any) => {
@@ -185,19 +188,24 @@ const goBack = () => {
 
 const PlantStatusArr = [{
   label: '萌发期',
-  value: '1'
+  value: '1',
+  color: 'pink'
 }, {
   label: '幼苗期',
-  value: '2'
+  value: '2',
+  color: 'green'
 }, {
   label: '生长期',
-  value: '3'
+  value: '3',
+  color: 'blue'
 }, {
   label: '开花期',
-  value: '4'
+  value: '4',
+  color: 'purple'
 }, {
   label: '结果期',
-  value: '5'
+  value: '5',
+  color: 'orange'
 }]
 
 const imageFormRef = ref<FormInstance>();
@@ -213,6 +221,7 @@ const addImage = () => {
   isEditImage.value = true
   editImageId = undefined
   imageFormState.PictureName = ''
+  imageFormState.PictureType = ''
   imageFormState.PictureDescription = ''
 }
 const cancelAddImage = () => {
@@ -238,6 +247,7 @@ const updateImage = (item: ImageFormState) => {
   isEditImage.value = true
   editImageId = item.id
   imageFormState.PictureName = item.PictureName
+  imageFormState.PictureType = item.PictureType
   imageFormState.PictureDescription = item.PictureDescription
 }
 let imageList = ref<ImageFormState[]>([])
@@ -313,7 +323,7 @@ onBeforeMount(async () => {
       <a-button @click="selectNone">取消选中</a-button>
     </div>
     <a-row :gutter="24">
-      <a-col :span="4" v-for="(item, index) in imageList" :key="item.id" class="gallery-image">
+      <a-col :span="6" v-for="(item, index) in imageList" :key="item.id" class="gallery-image">
         <a-card hoverable>
           <template #cover>
             <div class="cover-wrapper">
@@ -330,7 +340,7 @@ onBeforeMount(async () => {
             </div>
           </template>
           <a-card-meta :title="item.PictureName">
-            <template #description>{{ item.PictureDescription }}</template>
+            <template #description><a-tag :color="item.PictureTypeObj.color">{{ item.PictureTypeObj.label }}</a-tag>{{ item.PictureDescription }}</template>
           </a-card-meta>
         </a-card>
       </a-col>
@@ -372,7 +382,7 @@ onBeforeMount(async () => {
           name="PictureDescription"
           label="图片描述"
         >
-          <a-input v-model:value="imageFormState.PictureDescription" placeholder=""></a-input>
+          <a-textarea v-model:value="imageFormState.PictureDescription" placeholder=""></a-textarea>
         </a-form-item>
         <a-form-item
           name="fileList"
@@ -397,9 +407,12 @@ onBeforeMount(async () => {
 }
 .cover-wrapper {
   width: 100%;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .cover-wrapper  > .ant-checkbox-wrapper {
   position: absolute;

@@ -204,6 +204,7 @@ const detailGet = async () => {
     imageList.value = list.map(item => ({
       ...item,
       url: `${import.meta.env.VITE_BACKEND_URL}${item.PictureSite}`,
+      PictureTypeObj: PlantStatusArr[Number(item.PictureType) - 1],
       checked: false,
     }))
   }
@@ -242,19 +243,24 @@ const onFinish = async (values: any) => {
 
 const PlantStatusArr = [{
   label: '萌发期',
-  value: '1'
+  value: '1',
+  color: 'pink'
 }, {
   label: '幼苗期',
-  value: '2'
+  value: '2',
+  color: 'green'
 }, {
   label: '生长期',
-  value: '3'
+  value: '3',
+  color: 'blue'
 }, {
   label: '开花期',
-  value: '4'
+  value: '4',
+  color: 'purple'
 }, {
   label: '结果期',
-  value: '5'
+  value: '5',
+  color: 'orange'
 }]
 
 const imageFormRef = ref<FormInstance>();
@@ -520,7 +526,7 @@ onBeforeMount(async () => {
       <a-button @click="selectNone">取消选中</a-button>
     </div>
     <a-row :gutter="24">
-      <a-col :span="4" v-for="(item, index) in imageList" :key="item.id" class="gallery-image">
+      <a-col :span="6" v-for="(item, index) in imageList" :key="item.id" class="gallery-image">
         <a-card hoverable>
           <template #cover>
             <div class="cover-wrapper">
@@ -538,7 +544,9 @@ onBeforeMount(async () => {
           </template>
           <a-card-meta title="">
             <template #description>
-              <div>{{ item.Description }}</div>
+              <div style="margin-bottom: 16px;">
+                <a-tag :color="item.PictureTypeObj.color">{{ item.PictureTypeObj.label }}</a-tag>{{ item.Description }}
+              </div>
               <div><a-button @click="detect(item)" :loading="detectLoading">对比检测</a-button></div>
             </template>
           </a-card-meta>
@@ -623,9 +631,12 @@ onBeforeMount(async () => {
 }
 .cover-wrapper {
   width: 100%;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .cover-wrapper  > .ant-checkbox-wrapper {
   position: absolute;
