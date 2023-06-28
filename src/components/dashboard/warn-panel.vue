@@ -141,7 +141,7 @@ export default defineComponent({
   height: 632px;
 }
 .card {
-  background-color: rgb(153, 153, 153, 0.7);
+  background-color: #7cb305;
   border-radius: 5px;
   color: #fff;
   margin-bottom: 24px;

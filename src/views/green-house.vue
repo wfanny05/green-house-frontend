@@ -221,8 +221,8 @@ onBeforeMount(async () => {
     </a-form>
 
     <div>
-      <a-button type="primary" @click="toFormPage(undefined)">新增</a-button>
-      <a-button @click="greenHouseMultiDelete">批量删除</a-button>
+      <a-button type="primary" @click="toFormPage(undefined)" style="margin-right: 8px;">新增</a-button>
+      <a-button @click="greenHouseMultiDelete" style="margin: 8px 0;">批量删除</a-button>
     </div>
 
     <a-alert :message="alertMsg" type="info" show-icon />

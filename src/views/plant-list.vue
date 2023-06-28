@@ -273,7 +273,7 @@ onBeforeMount(async () => {
     </a-form>
 
     <div>
-      <a-button type="primary" @click="toFormPage(undefined)">新增</a-button>
+      <a-button type="primary" @click="toFormPage(undefined)" style="margin-right: 8px;">新增</a-button>
       <a-button @click="plantMultiDelete">批量删除</a-button>
     </div>
 
